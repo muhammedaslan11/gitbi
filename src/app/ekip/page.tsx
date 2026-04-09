@@ -1,10 +1,11 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { Typography } from "@/components"
 import Image from "next/image"
 import InfiniteMenu from "@/components/ui/infinite-menu"
 import { teamItems, teamPageContent } from "@/config/team"
+import { motion, AnimatePresence } from "motion/react"
 
 const TeamCard = ({
   item,
@@ -15,8 +16,10 @@ const TeamCard = ({
 }) => {
   const paddedIndex = (index + 1).toString().padStart(2, "0")
 
-  // Extract a short role for the badge
-  const roleBadge = item.description.split("|")[0].trim().toUpperCase()
+  // Separate role and status: "Role | Status"
+  const parts = item.description.split("|")
+  const roleBadge = parts[0].trim().toUpperCase()
+  const statusText = parts[1] ? parts[1].trim() : "GİTBİ Üyesi"
 
   return (
     <div className="group relative flex flex-col bg-black/40 border border-white/5 overflow-hidden transition-all duration-500 hover:border-white/20">
@@ -33,7 +36,7 @@ const TeamCard = ({
       </div>
 
       {/* Info Section */}
-      <div className="p-5 flex flex-col gap-2 relative z-10">
+      <div className="p-3 sm:p-5 flex flex-col gap-1 sm:gap-2 relative z-10">
         <div className="flex justify-between items-center mb-1">
           <span className="text-2xl font-bold font-mono text-white/20 group-hover:text-white/40 transition-colors">
             {paddedIndex}
@@ -43,11 +46,11 @@ const TeamCard = ({
           </div>
         </div>
 
-        <h3 className="text-xl font-bold text-white tracking-tight uppercase group-hover:text-[#3B82F6] transition-colors">
+        <h3 className="text-base sm:text-xl font-bold text-white tracking-tight uppercase group-hover:text-[#3B82F6] transition-colors">
           {item.title}
         </h3>
         <p className="text-xs text-gray-400 font-medium leading-relaxed">
-          {item.description}
+          {statusText}
         </p>
       </div>
     </div>
@@ -56,6 +59,18 @@ const TeamCard = ({
 
 export default function EkipPage() {
   const [viewMode, setViewMode] = useState<"3d" | "grid">("grid")
+  const [showHint, setShowHint] = useState(false)
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout
+    if (viewMode === "3d") {
+      setShowHint(true)
+      timer = setTimeout(() => setShowHint(false), 4500)
+    } else {
+      setShowHint(false)
+    }
+    return () => clearTimeout(timer)
+  }, [viewMode])
 
   return (
     <div className="min-h-screen bg-black text-white overflow-hidden relative">
@@ -115,7 +130,70 @@ export default function EkipPage() {
       </div>
 
       {viewMode === "3d" ? (
-        <div className="fixed inset-0 w-screen h-screen overflow-hidden text-white flex flex-col items-center justify-center z-40 bg-on-black">
+        <div 
+          className="fixed inset-0 w-screen h-screen overflow-hidden text-white flex flex-col items-center justify-center z-40 bg-on-black"
+          onPointerDown={() => setShowHint(false)}
+        >
+          <AnimatePresence>
+            {showHint && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="absolute inset-0 z-50 pointer-events-none flex items-center justify-center bg-black/50 backdrop-blur-[2px] transition-all duration-500"
+              >
+                <div className="flex flex-col items-center justify-center gap-8 -mt-20">
+                  {/* Finger Animation */}
+                  <motion.div
+                    animate={{
+                      x: [0, -60, 60, 0],
+                      rotate: [0, -15, 15, 0],
+                      scale: [1, 1.1, 1.1, 1],
+                    }}
+                    transition={{
+                      duration: 2.5,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    }}
+                    className="text-white relative"
+                  >
+                    {/* Glow behind hand */}
+                    <div className="absolute inset-0 bg-[#3B82F6]/30 blur-2xl rounded-full scale-150"></div>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="72"
+                      height="72"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="relative z-10 drop-shadow-[0_0_15px_rgba(59,130,246,0.8)]"
+                    >
+                      <path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0" />
+                      <path d="M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v2" />
+                      <path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8" />
+                      <path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15" />
+                    </svg>
+                  </motion.div>
+                  
+                  {/* Text */}
+                  <motion.div
+                    animate={{ opacity: [0.6, 1, 0.6] }}
+                    transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                    className="flex flex-col items-center gap-2"
+                  >
+                    <p className="text-white text-2xl md:text-3xl font-bold tracking-wider drop-shadow-xl text-center uppercase">
+                      Dokun ve Gezdir
+                    </p>
+                    <div className="h-0.5 w-16 bg-[#3B82F6] shadow-[0_0_10px_rgba(59,130,246,0.8)] rounded-full mb-1"></div>
+                  </motion.div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           {/* Title Overlay for 3D */}
           <div className="absolute top-28 md:top-36 left-0 w-full z-10 pointer-events-none text-center px-4">
             <Typography.H1 className="font-normal font-wc-rough-trad text-[#f2f3f7] text-[clamp(2.5rem,4vw,5rem)] drop-shadow-lg">
@@ -128,7 +206,7 @@ export default function EkipPage() {
 
           {/* Fullscreen Canvas Container */}
           <div className="absolute inset-0 w-full h-full z-0">
-            <InfiniteMenu items={teamItems} scale={0.9} />
+            <InfiniteMenu items={teamItems} scale={0.9} initialTargetIndex={0} />
           </div>
         </div>
       ) : (
@@ -145,7 +223,7 @@ export default function EkipPage() {
           </div>
 
           {/* Grid Section */}
-          <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8 pb-10">
+          <div className="max-w-7xl mx-auto grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6 md:gap-8 pb-10">
             {teamItems.map((item, index) => (
               <TeamCard key={index} item={item} index={index} />
             ))}

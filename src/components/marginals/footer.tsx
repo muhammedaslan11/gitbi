@@ -5,8 +5,6 @@ import { Typography } from "@/components"
 import { FOOTER_TEXT, SOCIALS, navItems } from "@/config/marginals"
 
 export default function Footer() {
-  const leftSocials = SOCIALS.slice(0, 2)
-  const rightSocials = SOCIALS.slice(2)
 
   return (
     <footer
@@ -24,67 +22,24 @@ export default function Footer() {
           </Link>
         ))}
       </div>
-      {/* Desktop Social Links - Above Logo */}
-      <div className="hidden lg:flex w-full justify-center items-center gap-[30vw]">
-        {/* Left Socials */}
-        <div className="flex gap-6 lg:gap-8 mr-16 ">
-          {leftSocials.map((social) => (
-            <Link
-              key={social.name}
-              href={social.href}
-              className="flex items-center gap-2 text-black hover:opacity-75 transition-opacity"
-            >
-              <Image
-                src={social.icon}
-                alt={social.name}
-                width={32}
-                height={32}
-                className="w-6 h-6 lg:w-6 lg:h-6 xl:w-8 xl:h-8 2xl:w-10 2xl:h-10"
-              />
-              <Typography.P className="font-prompt my-auto text-sm! font-medium text-black">
-                {social.name.toUpperCase()}
-              </Typography.P>
-            </Link>
-          ))}
-        </div>
-
-        {/* Right Socials */}
-        <div className="flex gap-6 lg:gap-8">
-          {rightSocials.map((social) => (
-            <Link
-              key={social.name}
-              href={social.href}
-              className="flex items-center gap-2 text-black hover:opacity-75 transition-opacity"
-            >
-              <Image
-                src={social.icon}
-                alt={social.name}
-                width={32}
-                height={32}
-                className="w-5 h-5 lg:w-6 lg:h-6 xl:w-8 xl:h-8 2xl:w-10 2xl:h-10"
-              />
-              <Typography.P className="font-prompt my-auto text-sm! font-medium text-black">
-                {social.name.toUpperCase()}
-              </Typography.P>
-            </Link>
-          ))}
-        </div>
-      </div>
-      {/* Mobile Social Links - Horizontal Layout */}
-      <div className="flex lg:hidden w-full justify-center items-center gap-10 xs:gap-20">
+      {/* Social Links */}
+      <div className="flex w-full justify-center items-center gap-6 lg:gap-10 sm:gap-8 md:gap-12">
         {SOCIALS.map((social) => (
           <Link
             key={social.name}
             href={social.href}
-            className="flex items-center hover:opacity-75 transition-opacity"
+            className="flex items-center gap-2 text-black hover:opacity-75 transition-opacity"
           >
             <Image
               src={social.icon}
               alt={social.name}
-              width={32}
-              height={32}
-              className="w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10"
+              width={40}
+              height={40}
+              className="w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 lg:w-8 lg:h-8 xl:w-10 xl:h-10"
             />
+            <Typography.P className="hidden sm:block font-prompt my-auto text-sm font-medium text-black">
+              {social.name.toUpperCase()}
+            </Typography.P>
           </Link>
         ))}
       </div>
