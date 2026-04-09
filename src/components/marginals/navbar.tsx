@@ -57,9 +57,9 @@ function DesktopNavbar() {
                 e.preventDefault()
                 handleScrollToSection(item.href)
               }}
-              className="transition-colors cursor-pointer"
+              className="transition-opacity hover:opacity-70 cursor-pointer"
             >
-              <Typography.P className="!text-sm md:!text-base mb-0 text-center font-semibold text-white transition-colors duration-300">
+              <Typography.P className="!text-xs md:!text-sm mb-0 text-center font-averta-std font-medium text-white transition-colors duration-300 tracking-[0.15em] uppercase">
                 {item.name}
               </Typography.P>
             </button>
@@ -153,7 +153,7 @@ function MobileNavbar({
                     }}
                     className="transition-transform active:scale-95 group"
                   >
-                    <Typography.P className="text-white text-3xl font-bold text-center group-hover:text-primary transition-colors tracking-tight uppercase">
+                    <Typography.P className="text-white text-3xl font-averta-std font-semibold text-center group-hover:text-primary transition-colors tracking-widest uppercase">
                       {item.name}
                     </Typography.P>
                   </button>
