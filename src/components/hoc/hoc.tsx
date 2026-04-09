@@ -4,6 +4,7 @@ import { usePathname } from 'next/navigation';
 
 import Footer from '../marginals/footer';
 import Navbar from '../marginals/navbar';
+import Preloader from '../preloader/preloader';
 
 function HOC({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -11,6 +12,7 @@ function HOC({ children }: { children: React.ReactNode }) {
 
   return (
     <>
+      <Preloader />
       <Navbar />
       <ReactLenis
         root

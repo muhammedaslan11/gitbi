@@ -9,8 +9,8 @@ export const logo = {
   href: "/#hero",
   src: "/logo/gitbi-logo.png",
   alt: "GİTBİ Logo",
-  width: 95,
-  height: 95,
+  width: 120,
+  height: 120,
 }
 
 export const hamburgerIcon = {
@@ -22,8 +22,8 @@ export const hamburgerIcon = {
 
 export const DISCORD_LINK = "#"
 export const DEVFOLIO_LINK = "#"
-export const WHATSAPP_LINK = "#"
 export const INSTAGRAM_LINK = "https://www.instagram.com/gitbiofficial/"
+export const JOIN_LINK = "/aramiza-katil"
 
 export const background =
   "https://res.cloudinary.com/dscnitrourkela/image/upload/v1754225393/hacknitr/kih0gsyskoslbgd9frvz.png"
@@ -39,21 +39,6 @@ export const SOCIALS: Social[] = [
     name: "INSTAGRAM",
     href: INSTAGRAM_LINK,
     icon: "https://res.cloudinary.com/dscnitrourkela/image/upload/v1755710454/hacknitr/cd0lyrhdlzfrevhbgluk.png",
-  },
-  {
-    name: "LINKEDIN",
-    href: "#",
-    icon: "https://res.cloudinary.com/dscnitrourkela/image/upload/v1755710453/hacknitr/ljpzd4qbjttmkqrz3se0.png",
-  },
-  {
-    name: "TWITTER",
-    href: "#",
-    icon: "https://res.cloudinary.com/dscnitrourkela/image/upload/v1756584254/hacknitr/ba7wbkcwr2ukb9lk8snm.png",
-  },
-  {
-    name: "GITHUB",
-    href: "#",
-    icon: "https://res.cloudinary.com/dscnitrourkela/image/upload/v1755710453/hacknitr/xspkjzkj2uhjgiypnefh.png",
   },
 ]
 

@@ -23,11 +23,17 @@ export const TextReveal: FC<TextRevealProps> = ({ children, className }) => {
   }
 
   const words = children.split(" ")
+  
+  // Calculate total number of non-space characters for smooth progression
+  const totalChars = words.reduce((acc, word) => acc + word.length, 0)
+  
   const headingOpacity = useTransform(
     scrollYProgress,
     [0, 0.2, 0.8, 1],
     [0.5, 1, 1, 1],
   )
+
+  let charIndexOffset = 0;
 
   return (
     <div ref={targetRef} className={cn("relative h-[200vh]", className)}>
@@ -48,12 +54,20 @@ export const TextReveal: FC<TextRevealProps> = ({ children, className }) => {
 
           <div className="flex flex-wrap justify-center gap-x-2 gap-y-3 text-center text-lg font-normal md:text-xl lg:text-2xl">
             {words.map((word, i) => {
-              const start = 0.6 + (i / words.length) * 0.4
-              const end = start + 0.4 / words.length
+              const letters = word.split("")
               return (
-                <Word key={i} progress={scrollYProgress} range={[start, end]}>
-                  {word}
-                </Word>
+                <span key={i} className="flex">
+                  {letters.map((char, j) => {
+                    const start = 0.5 + (charIndexOffset / totalChars) * 0.5
+                    const end = start + 0.5 / totalChars
+                    charIndexOffset++
+                    return (
+                      <Char key={j} progress={scrollYProgress} range={[start, end]}>
+                        {char}
+                      </Char>
+                    )
+                  })}
+                </span>
               )
             })}
           </div>
@@ -63,16 +77,17 @@ export const TextReveal: FC<TextRevealProps> = ({ children, className }) => {
   )
 }
 
-interface WordProps {
+interface CharProps {
   children: ReactNode
   progress: MotionValue<number>
   range: [number, number]
 }
 
-const Word: FC<WordProps> = ({ children, progress, range }) => {
+const Char: FC<CharProps> = ({ children, progress, range }) => {
   const opacity = useTransform(progress, range, [0, 1])
+  
   return (
-    <span className="relative ">
+    <span className="relative inline-block">
       <span className="absolute opacity-30 dark:opacity-20">{children}</span>
       <motion.span
         style={{ opacity }}

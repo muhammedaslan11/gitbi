@@ -639,7 +639,8 @@ class InfiniteGridMenu {
     private onActiveItemChange: ActiveItemCallback,
     private onMovementChange: MovementChangeCallback,
     onInit?: InitCallback,
-    scale: number = 1.0
+    scale: number = 1.0,
+    private initialTargetIndex: number = -1
   ) {
     this.scaleFactor = scale;
     this.camera.position[2] = 3 * scale;
@@ -725,6 +726,33 @@ class InfiniteGridMenu {
 
     this.updateCameraMatrix();
     this.updateProjectionMatrix();
+
+    if (this.initialTargetIndex >= 0 && this.initialTargetIndex < this.items.length) {
+      let targetV = -1;
+      // Find the first vertex that displays this target index
+      for (let i = 0; i < this.instancePositions.length; i++) {
+        if (i % this.items.length === this.initialTargetIndex) {
+          targetV = i;
+          break;
+        }
+      }
+      
+      if (targetV !== -1) {
+        const v = vec3.normalize(vec3.create(), this.instancePositions[targetV]);
+        const target = vec3.fromValues(0, 0, -1);
+        
+        // Calculate the rotation needed
+        const axis = vec3.cross(vec3.create(), v, target);
+        const axisLength = vec3.length(axis);
+        
+        if (axisLength > 0.0001) {
+          vec3.normalize(axis, axis);
+          const dot = Math.max(-1, Math.min(1, vec3.dot(v, target)));
+          const angle = Math.acos(dot);
+          quat.setAxisAngle(this.control.orientation, axis, angle);
+        }
+      }
+    }
 
     this.resize();
 
@@ -986,9 +1014,10 @@ const defaultItems: MenuItem[] = [
 interface InfiniteMenuProps {
   items?: MenuItem[];
   scale?: number;
+  initialTargetIndex?: number;
 }
 
-const InfiniteMenu: FC<InfiniteMenuProps> = ({ items = [], scale = 1.0 }) => {
+const InfiniteMenu: FC<InfiniteMenuProps> = ({ items = [], scale = 1.0, initialTargetIndex = -1 }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null) as MutableRefObject<HTMLCanvasElement | null>;
   const [activeItem, setActiveItem] = useState<MenuItem | null>(null);
   const [isMoving, setIsMoving] = useState<boolean>(false);
@@ -1010,7 +1039,8 @@ const InfiniteMenu: FC<InfiniteMenuProps> = ({ items = [], scale = 1.0 }) => {
         handleActiveItem,
         setIsMoving,
         sk => sk.run(),
-        scale
+        scale,
+        initialTargetIndex
       );
     }
 
@@ -1040,8 +1070,10 @@ const InfiniteMenu: FC<InfiniteMenuProps> = ({ items = [], scale = 1.0 }) => {
             {activeItem.title}
           </h2>
           <div className="h-[2px] w-12 md:w-20 bg-[#3B82F6] mx-auto my-4 md:my-5 rounded-full shadow-[0_0_15px_rgba(59,130,246,0.5)]" />
-          <p className="text-sm md:text-xl font-medium text-gray-400 uppercase tracking-[0.3em] font-prompt">
-            {activeItem.description}
+          <p className="text-sm md:text-xl font-medium text-gray-400 uppercase tracking-[0.2em] font-prompt">
+            {activeItem.description.includes('|') 
+              ? `${activeItem.description.split('|')[0].trim()} — ${activeItem.description.split('|')[1].trim()}`
+              : activeItem.description}
           </p>
         </div>
       )}
