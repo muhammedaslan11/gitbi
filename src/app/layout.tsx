@@ -2,6 +2,7 @@ import "./globals.css"
 
 import type { Metadata } from "next"
 import Script from "next/script"
+import { Analytics } from "@vercel/analytics/next"
 
 import HOC from "@/components/hoc/hoc"
 import { metaDataObject } from "@/config/seo"
@@ -46,6 +47,7 @@ export default function RootLayout({
         className={` ${avertaStd.variable} ${grutchShaded.variable} ${museo.variable} ${sketchBlock.variable} ${wcRoughTrad.variable} ${cabinSketch.variable}  antialiased`}
       >
         <HOC>{children}</HOC>
+        <Analytics />
       </body>
     </html>
   )
