@@ -62,7 +62,7 @@ export default function Hero() {
       {/* Sticky Content that stays fixed in place while scrolling */}
       <div
         ref={stickyRef}
-        className="min-h-[100svh] sticky top-0 left-0 w-full flex flex-col justify-center items-center px-4 md:px-8 bg-gradient-to-br from-[#1b1e3e] via-[#4A55A2] to-[#7895CB] overflow-hidden [will-change:transform,opacity] [backface-visibility:hidden] [transform:translateZ(0)]"
+        className="min-h-[100lvh] sticky top-0 left-0 w-full flex flex-col justify-center items-center px-4 md:px-8 bg-gradient-to-br from-[#1b1e3e] via-[#4A55A2] to-[#7895CB] overflow-hidden [will-change:transform,opacity] [backface-visibility:hidden] [transform:translateZ(0)]"
       >
         {/* Optional Noise Overlay for texture */}
         <div className="absolute inset-0 z-0 opacity-20 pointer-events-none mix-blend-overlay" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E")' }}></div>
