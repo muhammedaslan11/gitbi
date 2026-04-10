@@ -36,12 +36,15 @@ const DEFAULT_CONFIG = {
  */
 const DEFAULT_COLORS = [
   
-    '#3b82f6', // blue-500
+    '#3268e4', // blue-500
+    '#4ad756',
+    '#e43232',
+    '#ed1556',
     
 ];
 
 // Colors where the logo overlay should be dark for contrast
-const LIGHT_HEXES = ['#3b82f6', '#86efac', '#ec4899', '#22c55e']; 
+const LIGHT_HEXES = ['#3268e4', '#86efac', '#ec4899', '#22c55e']; 
 
 const TransitionScribble = forwardRef<TransitionScribbleHandle, TransitionScribbleProps>(({
     logo,
