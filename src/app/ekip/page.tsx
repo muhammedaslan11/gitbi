@@ -228,6 +228,33 @@ export default function EkipPage() {
               <TeamCard key={index} item={item} index={index} />
             ))}
           </div>
+          {/* Spotify Section */}
+          <div className="max-w-4xl mx-auto mt-20 md:mt-32 mb-10 px-4">
+            <div className="flex flex-col items-center text-center mb-10">
+              <h2 className="text-2xl md:text-4xl font-averta-std font-black uppercase tracking-tighter mb-4">
+                Ekibin Favori Şarkıları
+              </h2>
+              <div className="w-16 h-1 bg-[#3B82F6] rounded-full shadow-[0_0_10px_rgba(59,130,246,0.5)] mb-4" />
+              <p className="text-gray-400 text-sm md:text-base uppercase tracking-widest font-medium">
+                Mutfakta neler dinliyoruz?
+              </p>
+            </div>
+            
+            <div className="relative group p-1 rounded-[16px] bg-gradient-to-br from-[#3B82F6]/20 to-transparent hover:from-[#3B82F6]/40 transition-all duration-500 shadow-2xl">
+              <iframe 
+                data-testid="embed-iframe" 
+                style={{ borderRadius: '12px' }} 
+                src="https://open.spotify.com/embed/playlist/5TW7i3ewK43yR5Q4ITwbPd?utm_source=generator&theme=0" 
+                width="100%" 
+                height="352" 
+                frameBorder="0" 
+                allowFullScreen={true} 
+                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+                loading="lazy"
+                className="shadow-inner"
+              ></iframe>
+            </div>
+          </div>
         </div>
       )}
     </div>

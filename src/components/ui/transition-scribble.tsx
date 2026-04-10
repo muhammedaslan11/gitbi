@@ -37,9 +37,6 @@ const DEFAULT_CONFIG = {
 const DEFAULT_COLORS = [
   
     '#3268e4', // blue-500
-    '#4ad756',
-    '#e43232',
-    '#ed1556',
     
 ];
 

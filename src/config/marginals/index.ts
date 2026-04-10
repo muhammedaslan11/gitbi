@@ -1,6 +1,6 @@
 export const navItems = [
-  { name: "İstatistikler", href: "/#stats" },
-  { name: "Süreç", href: "/#timeline" },
+  { name: "Istatistikler", href: "/#stats" },
+  { name: "Sureç", href: "/#timeline" },
   { name: "SSS", href: "/#faqs" },
   { name: "Ekibimiz", href: "/ekip" },
 ]

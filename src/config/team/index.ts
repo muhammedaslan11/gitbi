@@ -39,7 +39,7 @@ export const teamItems: TeamItem[] = [
   {
     image: "/ekip/prof.png",
     link: "#",
-    title: "Prof. Baransel",
+    title: "Baransel👨🏼‍🍳",
     description: "Founder | Creative Developer",
   },
   {
@@ -76,18 +76,6 @@ export const teamItems: TeamItem[] = [
     image: "/ekip/seyda.jpeg",
     link: "#",
     title: "Seyda",
-    description: "Team Member",
-  },
-  {
-    image: "/ekip/esra.jpeg",
-    link: "#",
-    title: "Esra",
-    description: "Team Member",
-  },
-  {
-    image: "/ekip/duygu.jpeg",
-    link: "#",
-    title: "Duygu",
     description: "Team Member",
   },
   {
