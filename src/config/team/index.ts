@@ -34,7 +34,7 @@ export const teamItems: TeamItem[] = [
     image: "/ekip/ahmet.jpeg",
     link: "#",
     title: "Ahmet",
-    description: "Team Member",
+    description: "Kurumsal İlişkiler | İletişim Sorumlusur",
   },
   {
     image: "/ekip/prof.png",
@@ -58,7 +58,7 @@ export const teamItems: TeamItem[] = [
     image: "/ekip/emir.jpeg",
     link: "#",
     title: "Emir",
-    description: "Team Member",
+    description: "Saha Sorumlusu | Network Sorumlusu",
   },
   {
     image: "/ekip/nazli.png",
@@ -67,16 +67,10 @@ export const teamItems: TeamItem[] = [
     description: "Team Lead | Social Media & Content Lead",
   },
   {
-    image: "/ekip/olgu.jpeg",
-    link: "#",
-    title: "Olgu",
-    description: "Team Member | Social Media & Content Lead",
-  },
-  {
     image: "/ekip/seyda.jpeg",
     link: "#",
     title: "Seyda",
-    description: "Team Member",
+    description: "Ekip Lideri | Strateji & Denetim",
   },
   {
     image: "/ekip/ipek.jpeg",
