@@ -5,6 +5,7 @@ import confetti from "canvas-confetti"
 import ShiftForm from "@/components/shift/ShiftForm"
 import ShiftAdmin from "@/components/shift/ShiftAdmin"
 import Button from "@/components/ui/button"
+import ProfessorMusic from "@/components/shift/ProfessorMusic"
 
 type View = "form" | "success" | "results" | "welcome"
 
@@ -186,6 +187,7 @@ export default function ShiftPage() {
 
         {/* Minimal Footer Signature */}
         <div className="mt-16 flex flex-col items-center gap-6">
+           <ProfessorMusic />
            <div className="h-px w-16 bg-white/10" />
            <span className="font-cabin-sketch text-3xl text-[#FFD100] -rotate-2 drop-shadow-lg">birlikte büyüyoruz</span>
            <span className="font-averta-std text-[10px] font-black uppercase tracking-[0.6em] text-white/20">GİTBİ KULÜBÜ &bull; 2026</span>
