@@ -162,9 +162,9 @@ const TransitionScribble = forwardRef<TransitionScribbleHandle, TransitionScribb
     }, [autoRun]);
 
     return (
-        <div ref={containerRef} className="fixed inset-0 z-[10000] pointer-events-none flex items-center justify-center overflow-hidden">
+        <div ref={containerRef} className="fixed inset-0 z-[10000] pointer-events-none flex items-center justify-center overflow-hidden" style={{ height: '100dvh', minHeight: '100dvh' }}>
             {/* Arka plandaki ham sayfayı başlangıçta gizlemek için düz zemin. Sayfa geçiş animasyonlarında kullanılır. */}
-            <div ref={initialVeilRef} className="absolute inset-0 w-full h-full bg-background" />
+            <div ref={initialVeilRef} className="absolute inset-0 w-full h-full" style={{ backgroundColor: pathColor }} />
 
             <svg
                 ref={svgRef}

@@ -18,7 +18,7 @@ export function Timeline() {
   return (
     <div
       id="timeline"
-      className=" mt-28 md:mt-56 mb-28  lg:h-[128vw] xlg:h-[126vw] xl:h-[118vw] "
+      className="bg-white mt-28 md:mt-56 mb-28  lg:h-[128vw] xlg:h-[126vw] xl:h-[118vw] "
       ref={ref}
     >
       <TimelineEvents />

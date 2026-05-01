@@ -1,6 +1,6 @@
 import "./globals.css"
 
-import type { Metadata } from "next"
+import type { Metadata, Viewport } from "next"
 import Script from "next/script"
 import { Analytics } from "@vercel/analytics/next"
 
@@ -17,6 +17,11 @@ import {
 
 export const metadata = metaDataObject as Metadata
 
+export const viewport: Viewport = {
+  viewportFit: 'cover',
+  themeColor: '#000000',
+}
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -28,22 +33,7 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.png" type="image/png" sizes="any" />
         <link rel="shortcut icon" href="/favicon.png" type="image/png" />
         <link rel="apple-touch-icon" href="/favicon.png" />
-        <meta name="theme-color" content="#000000" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <Script
-          async
-          src={`https://www.googletagmanager.com/gtag/js?id=${process.env.GOOGLE_ANALYTICS_MEASUREMENT_ID}`}
-          strategy="afterInteractive"
-        ></Script>
-        <Script id="google-analytics" strategy="afterInteractive">
-          {`
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-  
-          gtag('config', '${process.env.GOOGLE_ANALYTICS_MEASUREMENT_ID}');
-        `}
-        </Script>
       </head>
       <body
         className={` ${avertaStd.variable} ${grutchShaded.variable} ${museo.variable} ${sketchBlock.variable} ${wcRoughTrad.variable} ${cabinSketch.variable} bg-[#000000] antialiased`}

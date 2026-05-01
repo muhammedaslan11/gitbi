@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useMemo, useEffect } from "react"
-import { DAYS, Day, timeToMinutes, DAY_START, DAY_END, getPercentage, getWidthPercentage } from "@/lib/shift-utils"
+import { DAYS, timeToMinutes, DAY_START, DAY_END, getPercentage, getWidthPercentage } from "@/lib/shift-utils"
 import Button from "@/components/ui/button"
 
 interface Participant {
@@ -15,290 +15,254 @@ interface ShiftAdminProps {
 }
 
 export default function ShiftAdmin({ participants }: ShiftAdminProps) {
-  const [selectedRange, setSelectedRange] = useState<{ day: string, range: string, members: string[] } | null>(null)
-  const [isAnalyzing, setIsAnalyzing] = useState(true)
+  const [selectedRange, setSelectedRange] = useState<{ day: string; range: string; members: string[] } | null>(null)
 
-  useEffect(() => {
-    // Artificial AI analysis delay for premium feel
-    const timer = setTimeout(() => setIsAnalyzing(false), 2000)
-    return () => clearTimeout(timer)
-  }, [])
-
+  // Hour labels: every 2 hours for readability
   const hours = useMemo(() => {
     const arr = []
-    for (let h = DAY_START; h <= DAY_END; h++) {
+    for (let h = DAY_START; h <= DAY_END; h += 2) {
       arr.push(`${String(h).padStart(2, "0")}:00`)
     }
     return arr
   }, [])
 
-  // Advanced Overlap Algorithm
   const getOverlapData = useMemo(() => {
     const allRangesByDay: Record<string, any[]> = {}
-    let maxOverallCount = 0
 
     DAYS.forEach(day => {
-      const slots = participants.flatMap(p => 
+      const slots = participants.flatMap(p =>
         p.slots.filter(s => s.day === day).map(s => ({ ...s, name: p.name }))
       )
-      if (slots.length === 0) {
-        allRangesByDay[day] = []
-        return
-      }
+      if (slots.length === 0) { allRangesByDay[day] = []; return }
+
       const points = new Set<number>()
-      slots.forEach(s => {
-        points.add(timeToMinutes(s.start))
-        points.add(timeToMinutes(s.end))
-      })
+      slots.forEach(s => { points.add(timeToMinutes(s.start)); points.add(timeToMinutes(s.end)) })
       const sortedPoints = Array.from(points).sort((a, b) => a - b)
       const ranges: any[] = []
+
       for (let i = 0; i < sortedPoints.length - 1; i++) {
-        const start = sortedPoints[i]
-        const end = sortedPoints[i+1]
+        const start = sortedPoints[i], end = sortedPoints[i + 1]
         const mid = (start + end) / 2
-        const activeParticipants = slots.filter(s => timeToMinutes(s.start) <= mid && timeToMinutes(s.end) >= mid).map(s => s.name)
-        if (activeParticipants.length > 0) {
-          const startTimeStr = `${Math.floor(start/60).toString().padStart(2,'0')}:${(start%60).toString().padStart(2,'0')}`
-          const endTimeStr = `${Math.floor(end/60).toString().padStart(2,'0')}:${(end%60).toString().padStart(2,'0')}`
-          ranges.push({ day, start: startTimeStr, end: endTimeStr, startMin: start, count: activeParticipants.length, members: activeParticipants })
-          if (activeParticipants.length > maxOverallCount) maxOverallCount = activeParticipants.length
+        const active = slots.filter(s => timeToMinutes(s.start) <= mid && timeToMinutes(s.end) >= mid).map(s => s.name)
+        if (active.length > 0) {
+          const fmt = (m: number) => `${Math.floor(m / 60).toString().padStart(2, '0')}:${(m % 60).toString().padStart(2, '0')}`
+          ranges.push({ day, start: fmt(start), end: fmt(end), startMin: start, count: active.length, members: active })
         }
       }
+
       const merged: any[] = []
       if (ranges.length > 0) {
-        let current = ranges[0]
+        let cur = ranges[0]
         for (let i = 1; i < ranges.length; i++) {
-          const next = ranges[i]
-          const currentMembers = [...current.members].sort().join(',')
-          const nextMembers = [...next.members].sort().join(',')
-          if (current.end === next.start && current.count === next.count && currentMembers === nextMembers) {
-            current.end = next.end
-          } else {
-            merged.push(current)
-            current = next
-          }
+          const nxt = ranges[i]
+          if (cur.end === nxt.start && cur.count === nxt.count && [...cur.members].sort().join() === [...nxt.members].sort().join()) {
+            cur.end = nxt.end
+          } else { merged.push(cur); cur = nxt }
         }
-        merged.push(current)
+        merged.push(cur)
       }
+
       allRangesByDay[day] = merged.map(r => {
         const duration = timeToMinutes(r.end) - timeToMinutes(r.start)
         return { ...r, duration, score: r.count * duration }
       })
     })
 
-    const allFlattenedRanges = DAYS.flatMap(day => allRangesByDay[day])
-    
-    // Smart Winner Selection: Prioritize (Count * Duration)
-    const sortedByScore = [...allFlattenedRanges].sort((a, b) => b.score - a.score || b.count - a.count)
-    
-    const absoluteWinner = sortedByScore.length > 0 ? { 
-      ...sortedByScore[0], 
-      range: `${sortedByScore[0].start}–${sortedByScore[0].end}` 
-    } : null
-
-    const alternatives = allFlattenedRanges
+    const flat = DAYS.flatMap(day => allRangesByDay[day])
+    const sorted = [...flat].sort((a, b) => b.score - a.score || b.count - a.count)
+    const winner = sorted.length > 0 ? { ...sorted[0], range: `${sorted[0].start}–${sorted[0].end}` } : null
+    const alternatives = flat
       .filter(r => r.count > 1)
-      .filter(r => !(absoluteWinner && r.day === absoluteWinner.day && r.start === absoluteWinner.start && r.end === absoluteWinner.end))
+      .filter(r => !(winner && r.day === winner.day && r.start === winner.start && r.end === winner.end))
       .sort((a, b) => b.score - a.score || b.count - a.count)
       .slice(0, 2)
 
-    return { allRangesByDay, absoluteWinner, alternatives }
+    return { allRangesByDay, winner, alternatives }
   }, [participants])
-
-  const bestSlots = useMemo(() => getOverlapData.absoluteWinner ? [getOverlapData.absoluteWinner] : [], [getOverlapData])
-
-  const calculateLayout = (day: string) => {
-    const slots = participants.flatMap(p => p.slots.filter(s => s.day === day).map(s => ({ ...s, name: p.name, startMin: timeToMinutes(s.start), endMin: timeToMinutes(s.end) }))).sort((a, b) => a.startMin - b.startMin || b.endMin - a.endMin)
-    const columns: any[][] = []
-    slots.forEach(slot => {
-      let placed = false
-      for (let i = 0; i < columns.length; i++) {
-        if (slot.startMin >= columns[i][columns[i].length - 1].endMin) {
-          columns[i].push(slot)
-          placed = true
-          break
-        }
-      }
-      if (!placed) columns.push([slot])
-    })
-    const results: any[] = []
-    columns.forEach((col, colIdx) => col.forEach(slot => results.push({ ...slot, width: 100 / columns.length, left: (colIdx * 100) / columns.length })))
-    return results
-  }
-
-  const sortedParticipants = useMemo(() => [...participants].sort((a, b) => a.name.localeCompare(b.name)), [participants])
 
   if (participants.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-32 space-y-6">
-        <div className="p-8 rounded-full bg-white/5 border border-dashed border-white/20">
-          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" className="text-white/20"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+        <div className="p-8 rounded-full bg-gray-50 border border-dashed border-gray-200">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" className="text-black/20">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" />
+          </svg>
         </div>
-        <p className="text-white/30 font-averta-std text-sm uppercase tracking-widest text-center">Henüz veri girilmedi</p>
+        <p className="text-black/30 font-averta-std text-sm uppercase tracking-widest text-center">Henüz veri girilmedi</p>
       </div>
     )
   }
 
+  const { winner, alternatives } = getOverlapData
+
   return (
-    <div className="space-y-12">
-      {/* Top Highlight Box with Minimalist AI Shimmer */}
-      <div className="flex justify-center">
-        <div className="relative w-full max-w-2xl">
-          <div className="relative bg-[#111111] border border-white/5 rounded-[32px] p-8 md:p-12 flex flex-col items-center gap-6 text-center overflow-hidden min-h-[220px] justify-center">
-            
-            <>
-              <div className="space-y-1">
-                <h3 className="font-averta-std font-black text-white/20 text-[9px] uppercase tracking-[0.5em]">En Uygun Toplantı Zamanı</h3>
-                <div className="w-8 h-0.5 bg-[#007f00]/30 mx-auto rounded-full" />
-              </div>
-              
-              {bestSlots.length > 0 ? (
-                <div className="space-y-5 animate-in fade-in slide-in-from-top-4 duration-700">
-                  <div className="flex flex-col md:flex-row items-center justify-center gap-6">
-                    <span className="text-5xl md:text-8xl font-wc-rough-trad text-white uppercase leading-none tracking-tight drop-shadow-2xl">{bestSlots[0].day}</span>
-                    <span className="text-2xl md:text-4xl font-averta-std font-black text-[#007f00] px-4 py-2">
-                      {bestSlots[0].range}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-4 justify-center">
-                     <div className="h-px w-8 bg-white/5" />
-                     <p className="text-[10px] text-white/40 font-black uppercase tracking-[0.2em]">{bestSlots[0].count} KİŞİ MÜSAİT</p>
-                     <div className="h-px w-8 bg-white/5" />
-                  </div>
-                </div>
-              ) : (
-                <div className="space-y-4 py-4 animate-in fade-in duration-700">
-                  <p className="text-xl md:text-2xl font-averta-std font-black text-white/40 uppercase tracking-tighter">Çakışma Bekleniyor</p>
-                  <p className="text-[9px] text-[#3B82F6]/60 font-black uppercase tracking-[0.3em]">Yeni veriler analiz edildiğinde burada belirecek.</p>
-                </div>
-              )}
-            </>
+    <div className="space-y-10">
+
+      {/* Winner card */}
+      <div className="bg-gray-50 border border-gray-100 rounded-2xl p-6 md:p-10 flex flex-col items-center gap-4 text-center">
+        <p className="text-[9px] font-black text-black/20 uppercase tracking-[0.5em]">En Uygun Toplantı Zamanı</p>
+        <div className="w-8 h-0.5 bg-[#0035d5]/30 rounded-full" />
+        {winner ? (
+          <div className="space-y-3">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <span className="text-5xl md:text-7xl font-wc-rough-trad text-[#0a0a0a] uppercase leading-none">{winner.day}</span>
+              <span className="text-2xl md:text-4xl font-averta-std font-black text-[#0035d5]">{winner.range}</span>
+            </div>
+            <p className="text-[10px] text-black/30 font-black uppercase tracking-[0.2em]">{winner.count} kişi müsait</p>
           </div>
-        </div>
+        ) : (
+          <p className="text-lg font-averta-std font-black text-black/20 uppercase">Çakışma bekleniyor</p>
+        )}
       </div>
 
-      {/* Calendar */}
-      <div className="relative pt-10 px-2 md:px-6 bg-black/20 rounded-[40px] border border-white/5 pb-12 overflow-x-auto custom-scrollbar">
-        <div className="min-w-[1400px]">
-          <div className="grid grid-cols-[80px_repeat(7,1fr)] gap-4 mb-8">
-            <div />
-            {DAYS.map(day => (
-              <div key={day} className="text-center">
-                <span className="text-xs font-bold text-white/70 uppercase tracking-tighter">{day}</span>
-              </div>
-            ))}
-          </div>
+      {/* Horizontal calendar */}
+      <div className="rounded-2xl border border-gray-100 overflow-hidden" data-lenis-prevent>
+        <div className="overflow-x-auto">
+          <div className="min-w-[560px]">
 
-          <div className="relative grid grid-cols-[80px_repeat(7,1fr)] gap-4 h-[700px]">
-            <div className="relative h-full flex flex-col justify-between text-[10px] font-black text-white/10 uppercase tracking-widest pr-4 py-1">
-              {hours.map(hour => <div key={hour} className="h-0 flex items-center justify-end">{hour}</div>)}
+            {/* Hour header row */}
+            <div className="flex border-b border-gray-100 bg-gray-50">
+              <div className="w-28 shrink-0 px-3 py-2" />
+              <div className="flex-1 relative h-8">
+                {hours.map((hour, i) => (
+                  <div
+                    key={hour}
+                    className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 text-[9px] font-black text-black/25 uppercase select-none"
+                    style={{ left: `${((i * 2) / (DAY_END - DAY_START)) * 100}%` }}
+                  >
+                    {hour}
+                  </div>
+                ))}
+                {/* End label */}
+                <div className="absolute top-1/2 -translate-y-1/2 -translate-x-full text-[9px] font-black text-black/25 uppercase select-none" style={{ left: '100%' }}>
+                  {String(DAY_END).padStart(2, '0')}:00
+                </div>
+              </div>
             </div>
 
-            {DAYS.map(day => {
-              const layoutSlots = calculateLayout(day)
-              const overlapRanges = getOverlapData.allRangesByDay[day]
-              const winner = getOverlapData.absoluteWinner
-              const alternativesOnDay = getOverlapData.alternatives.filter(alt => alt.day === day)
-              const activeHighlights = []
-              if (winner && winner.day === day) activeHighlights.push({ ...winner, isWinner: true })
-              alternativesOnDay.forEach(alt => activeHighlights.push({ ...alt, isWinner: false }))
+            {/* Day rows */}
+            {DAYS.map((day, dayIdx) => {
+              const daySlots = participants.flatMap(p =>
+                p.slots.filter(s => s.day === day).map(s => ({ ...s, name: p.name }))
+              )
+              const isWinnerDay = winner?.day === day
+              const altHighlights = alternatives.filter(a => a.day === day)
 
               return (
-                <div key={day} className="relative h-full border-l border-white/[0.03] group">
-                  <div className="absolute inset-y-0 left-0 w-px bg-white/[0.03] group-hover:bg-white/10 transition-colors" />
-                  <div className="absolute inset-0 pointer-events-none">
-                     {hours.map((_, i) => (
-                       <div key={i} className="absolute w-full border-t border-white/[0.01]" style={{ top: `${(i / (hours.length - 1)) * 100}%` }} />
-                     ))}
+                <div
+                  key={day}
+                  className={`flex border-b border-gray-100 last:border-b-0 ${dayIdx % 2 === 0 ? 'bg-white' : 'bg-gray-50/40'}`}
+                >
+                  {/* Day label */}
+                  <div className="w-28 shrink-0 flex items-center px-3 py-2">
+                    <span className="text-[10px] font-black text-black/40 uppercase leading-tight">{day}</span>
                   </div>
 
-                  {/* Individual Availability */}
-                  {layoutSlots.map((slot, idx) => (
-                    <div
-                      key={`ind-${idx}`}
-                      className="absolute bg-[#3B82F6]/20 border-l border-[#3B82F6]/40 z-0 group/slot hover:bg-[#3B82F6]/30 transition-all rounded-sm"
-                      style={{ top: `${getPercentage(slot.start)}%`, height: `${getWidthPercentage(slot.start, slot.end)}%`, left: `${slot.left}%`, width: `${slot.width - 0.5}%` }}
-                    >
-                      <div className="h-full w-full overflow-hidden flex flex-col p-1.5">
-                         {slot.width > 15 && (
-                           <span className="text-[9px] font-black text-white/60 uppercase tracking-tighter truncate group-hover/slot:text-white transition-colors">
-                              {slot.name.split(' ')[0]}
-                           </span>
-                         )}
-                      </div>
-                    </div>
-                  ))}
+                  {/* Time track */}
+                  <div className="flex-1 relative h-14 overflow-hidden">
+                    {/* Hour grid lines */}
+                    {Array.from({ length: DAY_END - DAY_START + 1 }, (_, i) => (
+                      <div
+                        key={i}
+                        className="absolute inset-y-0 w-px bg-gray-100"
+                        style={{ left: `${(i / (DAY_END - DAY_START)) * 100}%` }}
+                      />
+                    ))}
 
-                  {/* Overlap Highlights */}
-                  <div className="absolute inset-0 pointer-events-none z-10">
-                    {activeHighlights.map((r, i) => {
-                      const rangeStr = `${r.start}–${r.end}`
-                      return (
-                        <div
-                          key={`overlap-${i}`}
-                          className={`absolute inset-x-0 bg-gradient-to-r from-[#007f00]/20 to-transparent border-l-[4px] border-[#007f00] ${!r.isWinner ? 'border-dashed opacity-50' : 'shadow-[0_0_20px_rgba(74,222,128,0.1)]'} pointer-events-auto cursor-pointer flex items-center justify-center backdrop-blur-[1px] transition-all hover:from-[#007f00]/40`}
-                          style={{ top: `${getPercentage(r.start)}%`, height: `${getWidthPercentage(r.start, r.end)}%` }}
-                          onClick={() => setSelectedRange({ day, range: rangeStr, members: r.members })}
-                        >
-                           <div className="flex flex-col items-center">
-                              <span className="text-[9px] font-black text-white/90 uppercase tracking-widest">{r.isWinner ? 'ORTAK' : 'ALTERNATİF'}</span>
-                              <span className="text-[7px] font-bold text-white/40">{r.count} KİŞİ</span>
-                           </div>
+                    {/* Individual availability bars */}
+                    {daySlots.map((slot, idx) => (
+                      <div
+                        key={idx}
+                        className="absolute top-1 bottom-1 bg-[#0035d5]/10 border-l-2 border-[#0035d5]/30 rounded-sm"
+                        style={{
+                          left: `${getPercentage(slot.start)}%`,
+                          width: `${getWidthPercentage(slot.start, slot.end)}%`,
+                        }}
+                      />
+                    ))}
+
+                    {/* Winner highlight */}
+                    {isWinnerDay && winner && (
+                      <div
+                        className="absolute inset-y-0 bg-[#0035d5]/20 border-l-[3px] border-[#0035d5] cursor-pointer hover:bg-[#0035d5]/30 transition-all"
+                        style={{
+                          left: `${getPercentage(winner.start)}%`,
+                          width: `${getWidthPercentage(winner.start, winner.end)}%`,
+                        }}
+                        onClick={() => setSelectedRange({ day, range: winner.range, members: winner.members })}
+                      >
+                        <div className="h-full flex flex-col items-center justify-center px-1">
+                          <span className="text-[7px] font-black text-[#0035d5] uppercase leading-none">ORTAK</span>
                         </div>
-                      )
-                    })}
+                      </div>
+                    )}
+
+                    {/* Alternative highlights */}
+                    {altHighlights.map((alt, i) => (
+                      <div
+                        key={i}
+                        className="absolute inset-y-0 bg-[#0035d5]/10 border-l-[2px] border-dashed border-[#0035d5]/50 cursor-pointer hover:bg-[#0035d5]/20 transition-all"
+                        style={{
+                          left: `${getPercentage(alt.start)}%`,
+                          width: `${getWidthPercentage(alt.start, alt.end)}%`,
+                        }}
+                        onClick={() => setSelectedRange({ day, range: `${alt.start}–${alt.end}`, members: alt.members })}
+                      />
+                    ))}
                   </div>
                 </div>
               )
             })}
           </div>
         </div>
-
-        {/* Modal */}
-        {selectedRange && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-xl animate-in fade-in duration-300">
-             <div 
-               className="bg-[#121212] border border-white/10 rounded-[40px] md:rounded-[48px] p-8 md:p-12 w-full max-w-2xl shadow-2xl space-y-10 animate-in zoom-in-95 duration-300 overflow-y-auto max-h-[90vh]"
-               onClick={(e) => e.stopPropagation()}
-             >
-                <div className="flex justify-between items-start">
-                   <div className="space-y-2">
-                      <h4 className="font-wc-rough-trad text-white text-5xl md:text-7xl uppercase leading-none tracking-tighter">{selectedRange.day}</h4>
-                      <div className="flex items-center gap-3">
-                         <div className="w-2 h-2 bg-[#007f00] rounded-full animate-pulse shadow-[0_0_10px_#007f00]" />
-                         <p className="text-base md:text-xl text-[#007f00] font-averta-std font-black uppercase tracking-[0.2em]">{selectedRange.range}</p>
-                      </div>
-                   </div>
-                </div>
-                <div className="space-y-6">
-                   <div className="flex items-center gap-4">
-                      <div className="h-px flex-1 bg-white/5" />
-                      <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.4em]">Müsait Olan Ekip Üyeleri</p>
-                      <div className="h-px flex-1 bg-white/5" />
-                   </div>
-                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 md:gap-4">
-                      {selectedRange.members.map((name, idx) => (
-                        <div key={idx} className="group relative">
-                           <div className="absolute -inset-0.5 bg-gradient-to-r from-[#3B82F6]/20 to-transparent rounded-2xl blur opacity-0 group-hover:opacity-100 transition duration-500" />
-                           <div className="relative flex items-center gap-3 px-5 py-4 bg-white/[0.03] border border-white/5 rounded-2xl group-hover:border-[#3B82F6]/30 transition-all">
-                              <div className="w-2 h-2 rounded-full bg-[#3B82F6]/40 shrink-0" />
-                              <span className="text-sm font-bold text-white/70 group-hover:text-white transition-colors">{name}</span>
-                           </div>
-                        </div>
-                      ))}
-                   </div>
-                </div>
-                <div className="pt-4"><Button onClick={() => setSelectedRange(null)} className="w-full h-18 text-white font-averta-std font-black uppercase tracking-[0.3em] text-sm shadow-2xl rounded-3xl">Kapat</Button></div>
-             </div>
-          </div>
-        )}
       </div>
 
-      <div className="flex flex-col items-center gap-6 pt-8 border-t border-white/5">
-        <p className="text-[9px] font-black text-white/20 uppercase tracking-[0.4em]">Kayıtlı Katılımcılar</p>
-        <div className="flex flex-wrap justify-center gap-3">
+      {/* Modal */}
+      {selectedRange && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-xl animate-in fade-in duration-300">
+          <div
+            className="bg-white border border-gray-100 rounded-2xl p-8 md:p-10 w-full max-w-lg shadow-2xl space-y-8 animate-in zoom-in-95 duration-300 overflow-y-auto max-h-[90vh]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="space-y-2">
+              <h4 className="font-wc-rough-trad text-[#0a0a0a] text-4xl md:text-6xl uppercase leading-none">{selectedRange.day}</h4>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-[#0035d5] rounded-full" />
+                <p className="text-base text-[#0035d5] font-averta-std font-black uppercase tracking-[0.15em]">{selectedRange.range}</p>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="h-px flex-1 bg-gray-100" />
+                <p className="text-[9px] font-black text-black/20 uppercase tracking-[0.4em]">Müsait Ekip</p>
+                <div className="h-px flex-1 bg-gray-100" />
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                {selectedRange.members.map((name, idx) => (
+                  <div key={idx} className="flex items-center gap-2 px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl">
+                    <div className="w-2 h-2 rounded-full bg-[#0035d5]/40 shrink-0" />
+                    <span className="text-sm font-bold text-black/60">{name}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <Button onClick={() => setSelectedRange(null)} className="w-full h-11 text-white font-averta-std font-black uppercase tracking-[0.2em] text-xs">
+              Kapat
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* Participants list */}
+      <div className="flex flex-col items-center gap-5 pt-6 border-t border-gray-100">
+        <p className="text-[9px] font-black text-black/20 uppercase tracking-[0.4em]">Kayıtlı Katılımcılar</p>
+        <div className="flex flex-wrap justify-center gap-2">
           {[...participants].sort((a, b) => a.name.localeCompare(b.name)).map(p => (
-            <div key={p.id} className="min-w-[100px] h-10 flex items-center justify-center px-6 bg-white/[0.03] border border-white/5 rounded-full"><span className="text-[11px] font-bold text-white/50">{p.name}</span></div>
+            <div key={p.id} className="h-9 flex items-center px-5 bg-gray-50 border border-gray-100 rounded-full">
+              <span className="text-[11px] font-bold text-black/40">{p.name}</span>
+            </div>
           ))}
         </div>
       </div>

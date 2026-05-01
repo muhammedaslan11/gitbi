@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { DAYS, Day, timeToMinutes } from "@/lib/shift-utils"
+import { teamItems } from "@/config/team"
 import Button from "@/components/ui/button"
 
 interface ShiftSlot {
@@ -31,22 +32,15 @@ export default function ShiftForm({ onSave, participants }: ShiftFormProps) {
     const savedSlots = localStorage.getItem("gitbi-shift-slots")
     if (savedName) setName(savedName)
     if (savedSlots) {
-      try {
-        setSlots(JSON.parse(savedSlots))
-      } catch (e) {
-        console.error("Failed to parse saved slots", e)
-      }
+      try { setSlots(JSON.parse(savedSlots)) } catch { /* ignore */ }
     }
   }, [])
 
-  // Auto-sync logic: Stealthily pull data if name matches and form is empty
   useEffect(() => {
     if (!name.trim() || slots.length > 0) return
-
     const existing = participants.find(
       p => p.name.toLowerCase().trim() === name.toLowerCase().trim()
     )
-
     if (existing) {
       setSlots(existing.slots)
       setError("Eski kaydın bulundu, verilerin yüklendi. ⚡")
@@ -69,139 +63,134 @@ export default function ShiftForm({ onSave, participants }: ShiftFormProps) {
 
   const handleSave = async () => {
     setError(null)
-    if (!name.trim()) {
-      setError("Lütfen adınızı girin")
-      return
-    }
-    if (slots.length === 0) {
-      setError("En az bir müsaitlik alanı eklemelisiniz")
-      return
-    }
-
+    if (!name.trim()) { setError("Lütfen isminizi seçin"); return }
+    if (slots.length === 0) { setError("En az bir müsaitlik ekleyin"); return }
     setIsSaving(true)
     try {
       await onSave(name.trim(), slots)
       localStorage.setItem("gitbi-shift-name", name.trim())
       localStorage.setItem("gitbi-shift-slots", JSON.stringify(slots))
-    } catch (error) {
+    } catch {
       setError("Kaydedilirken bir hata oluştu")
     } finally {
       setIsSaving(false)
     }
   }
 
-  const inputStyle = "w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-white/20 focus:border-[#3B82F6] focus:ring-1 focus:ring-[#3B82F6]/50 transition-all outline-none"
+  const inputBase = "w-full bg-white border border-gray-200 rounded-lg px-3 py-2.5 text-[#0a0a0a] text-sm placeholder:text-black/20 focus:border-[#0035d5] focus:ring-1 focus:ring-[#0035d5]/20 transition-all outline-none"
+  const labelBase = "block text-[9px] text-black/30 uppercase font-black tracking-[0.2em] mb-1.5"
 
   return (
-    <div className="space-y-10 max-w-3xl mx-auto">
-      {/* Kimlik Bölümü */}
-      <div className="space-y-4">
-        <label className="block text-[10px] font-averta-std font-black uppercase tracking-[0.3em] text-[#3B82F6]">
-          Kimliğin
-        </label>
-        <input
-          type="text"
+    <div className="space-y-6">
+
+      {/* Kimsin — dropdown */}
+      <div>
+        <label className={labelBase}>Kimsin</label>
+        <select
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder="İsim Soyisim"
-          className={`${inputStyle} text-lg md:text-xl font-bold`}
-        />
+          className={`${inputBase} text-base font-semibold`}
+        >
+          <option value="">İsim seçin...</option>
+          {teamItems.map((member) => (
+            <option key={member.title} value={member.title} className="bg-white">
+              {member.title}
+            </option>
+          ))}
+        </select>
       </div>
 
-      {/* Giriş Alanı */}
-      <div className="relative p-6 md:p-8 rounded-[24px] bg-white/5 border border-white/5 overflow-hidden">
-        <div className="absolute top-0 right-0 p-4 opacity-5 hidden sm:block">
-          <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
-            <path d="M12 2v20M2 12h20" />
-          </svg>
-        </div>
-
-        <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-8">
-          <div className="w-10 h-10 rounded-full bg-[#3B82F6] flex items-center justify-center text-[10px] font-black shrink-0 shadow-[0_0_15px_rgba(59,130,246,0.5)]">
+      {/* Slot ekleme */}
+      <div className="rounded-xl border border-gray-100 bg-gray-50/50 p-4 md:p-5 space-y-4">
+        <div className="flex items-center gap-3">
+          <span className="w-6 h-6 rounded-full bg-[#0035d5] text-white text-[9px] font-black flex items-center justify-center shrink-0">
             01
-          </div>
-          <h3 className="text-lg md:text-xl font-averta-std font-black text-white uppercase tracking-tighter">
-            Müsait Olduğum Saatler ve Günler
+          </span>
+          <h3 className="text-xs font-averta-std font-black text-black/50 uppercase tracking-wider">
+            Müsait Olduğum Saatler
           </h3>
         </div>
-        
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6">
-          <div className="space-y-2">
-            <label className="text-[10px] text-white/40 uppercase font-black tracking-widest">GÜN</label>
-            <select
-              value={currentSlot.day}
-              onChange={(e) => setCurrentSlot({ ...currentSlot, day: e.target.value as Day })}
-              className={inputStyle}
-            >
-              {DAYS.map((d) => (
-                <option key={d} value={d} className="bg-black">{d}</option>
-              ))}
-            </select>
-          </div>
-          <div className="space-y-2">
-            <label className="text-[10px] text-white/40 uppercase font-black tracking-widest">BAŞLANGIÇ</label>
-            <input
-              type="time"
-              value={currentSlot.start}
-              onChange={(e) => setCurrentSlot({ ...currentSlot, start: e.target.value })}
-              className={inputStyle}
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="text-[10px] text-white/40 uppercase font-black tracking-widest">BİTİŞ</label>
-            <input
-              type="time"
-              value={currentSlot.end}
-              onChange={(e) => setCurrentSlot({ ...currentSlot, end: e.target.value })}
-              className={inputStyle}
-            />
-          </div>
+
+        {/* Gün */}
+        <div>
+          <label className={labelBase}>Gün</label>
+          <select
+            value={currentSlot.day}
+            onChange={(e) => setCurrentSlot({ ...currentSlot, day: e.target.value as Day })}
+            className={inputBase}
+          >
+            {DAYS.map((d) => (
+              <option key={d} value={d} className="bg-white">{d}</option>
+            ))}
+          </select>
+        </div>
+
+        {/* Başlangıç */}
+        <div>
+          <label className={labelBase}>Başlangıç</label>
+          <input
+            type="time"
+            value={currentSlot.start}
+            onChange={(e) => setCurrentSlot({ ...currentSlot, start: e.target.value })}
+            className={inputBase}
+          />
+        </div>
+
+        {/* Bitiş */}
+        <div>
+          <label className={labelBase}>Bitiş</label>
+          <input
+            type="time"
+            value={currentSlot.end}
+            onChange={(e) => setCurrentSlot({ ...currentSlot, end: e.target.value })}
+            className={inputBase}
+          />
         </div>
 
         <button
           onClick={addSlot}
-          className="mt-8 w-full py-4 rounded-xl border-2 border-dashed border-[#3B82F6]/30 text-[#3B82F6] hover:bg-[#3B82F6]/10 hover:border-[#3B82F6] active:scale-95 transition-all font-averta-std font-black uppercase tracking-widest text-[10px]"
+          className="w-full py-3 rounded-lg border border-dashed border-gray-200 text-black/30 hover:text-black/60 hover:border-gray-300 active:scale-[0.98] transition-all font-averta-std font-black uppercase tracking-widest text-[10px]"
         >
           + Listeye Ekle
         </button>
       </div>
 
-      {/* Liste Alanı */}
+      {/* Slot listesi */}
       {slots.length > 0 && (
-        <div className="space-y-6">
-          <div className="flex items-center gap-4">
-             <div className="w-10 h-10 rounded-full bg-[#FFD100] flex items-center justify-center text-[10px] font-black text-black shrink-0 shadow-[0_0_15px_rgba(255,209,0,0.3)]">
+        <div className="space-y-3">
+          <div className="flex items-center gap-3">
+            <span className="w-6 h-6 rounded-full bg-[#0035d5] text-white text-[9px] font-black flex items-center justify-center shrink-0">
               02
-            </div>
-            <h3 className="text-lg md:text-xl font-averta-std font-black text-white uppercase tracking-tighter">
-              Müsaitlik Listesi (Taslak)
+            </span>
+            <h3 className="text-xs font-averta-std font-black text-black/50 uppercase tracking-wider">
+              Müsaitlik Listesi
             </h3>
           </div>
-          
-          <div className="grid gap-3">
+
+          <div className="grid gap-2">
             {slots.map((s, i) => (
               <div
                 key={i}
-                className="group flex items-center justify-between p-4 md:p-5 rounded-2xl bg-white/5 border border-white/5 hover:border-[#3B82F6]/30 transition-all"
+                className="group flex items-center justify-between px-3.5 py-3 rounded-xl bg-white border border-gray-100 hover:border-gray-200 transition-all"
               >
-                <div className="flex items-center gap-4 md:gap-6">
-                  <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-[#3B82F6]/10 flex items-center justify-center text-[#3B82F6] shrink-0">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <circle cx="12" cy="12" r="10"></circle>
-                      <polyline points="12 6 12 12 16 14"></polyline>
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-[#0035d5]/10 flex items-center justify-center text-[#0035d5] shrink-0">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <circle cx="12" cy="12" r="10" />
+                      <polyline points="12 6 12 12 16 14" />
                     </svg>
                   </div>
-                  <div className="flex flex-col">
-                    <span className="text-[10px] text-white/40 font-black uppercase tracking-widest">{s.day}</span>
-                    <span className="text-base md:text-lg font-bold text-white tracking-tight">{s.start} – {s.end}</span>
+                  <div>
+                    <div className="text-[9px] text-black/30 font-black uppercase tracking-widest">{s.day}</div>
+                    <div className="text-sm font-bold text-[#0a0a0a]">{s.start} – {s.end}</div>
                   </div>
                 </div>
                 <button
                   onClick={() => removeSlot(i)}
-                  className="w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center bg-red-500/10 text-red-400 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all hover:bg-red-500 hover:text-white"
+                  className="w-7 h-7 rounded-full flex items-center justify-center text-red-400/50 hover:text-red-500 hover:bg-red-50 transition-all"
                 >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                    <path d="M18 6L6 18M6 6l12 12"></path>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <path d="M18 6L6 18M6 6l12 12" />
                   </svg>
                 </button>
               </div>
@@ -210,16 +199,17 @@ export default function ShiftForm({ onSave, participants }: ShiftFormProps) {
         </div>
       )}
 
-      <div className="pt-6 flex flex-col items-center gap-4">
+      {/* Hata & Kaydet */}
+      <div className="flex flex-col items-center gap-3 pt-2">
         {error && (
-          <p className={`${error.includes('bulundu') ? 'text-blue-400' : 'text-red-500'} text-[10px] font-black uppercase tracking-[0.2em] animate-pulse text-center`}>
+          <p className={`${error.includes("bulundu") ? "text-[#0035d5]" : "text-red-500"} text-[10px] font-black uppercase tracking-[0.2em] text-center`}>
             {error}
           </p>
         )}
-        <Button 
-          onClick={handleSave} 
+        <Button
+          onClick={handleSave}
           disabled={isSaving}
-          className="w-full sm:w-80 h-14 text-white font-averta-std font-black uppercase tracking-[0.2em] text-sm shadow-xl"
+          className="w-full h-12 text-white font-averta-std font-black uppercase tracking-[0.15em] text-xs"
         >
           {isSaving ? "Gönderiliyor..." : "Tümünü Gönder"}
         </Button>

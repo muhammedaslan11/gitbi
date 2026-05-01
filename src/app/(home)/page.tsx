@@ -26,8 +26,10 @@ export default function Home() {
       <div className="bg-on-black">
         <Gallery />
       </div>
-      <ScrollMarquee />
-      <Timeline />
+      <div className="bg-white overflow-hidden">
+        <ScrollMarquee />
+        <Timeline />
+      </div>
 
       <div className="bg-on-black">
         <Testimonials />
@@ -36,7 +38,9 @@ export default function Home() {
         </div>
         <FaqList />
       </div>
-      <ScrollMarquee />
+      <div className="bg-white">
+        <ScrollMarquee />
+      </div>
       <AsciiLogger />
     </>
   )

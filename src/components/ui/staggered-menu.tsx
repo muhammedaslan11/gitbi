@@ -531,7 +531,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
       {/* HEADER FOR BLENDED ELEMENTS (Logo & Toggle) */}
       <header
         className="sm-scope staggered-menu-header-blended fixed top-4 md:top-10 left-0 w-full h-[60px] md:h-[100px] bg-transparent pointer-events-none z-[60] transition-all duration-300"
-        style={{ mixBlendMode: !open ? "difference" : "normal" }}
+        style={{ mixBlendMode: !open ? "difference" : "normal", top: 'max(1rem, env(safe-area-inset-top))' }}
         aria-label="Blended navigation header"
       >
         {/* MOBILE LOGO (Left) | DESKTOP LOGO (Center) */}
@@ -596,7 +596,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
       </header>
 
       {/* NORMAL HEADER FOR NON-BLENDED ELEMENTS (Aramıza Katıl) */}
-      <div className="sm-scope staggered-menu-header-normal fixed top-4 md:top-10 left-0 w-full h-[60px] md:h-[100px] pointer-events-none z-[60] transition-all duration-300">
+      <div className="sm-scope staggered-menu-header-normal fixed top-4 md:top-10 left-0 w-full h-[60px] md:h-[100px] pointer-events-none z-[60] transition-all duration-300" style={{ top: 'max(1rem, env(safe-area-inset-top))' }}>
         {/* DESKTOP LET'S TALK / ARAMIZA KATIL BUTTON (Right) */}
         <div className={`absolute right-10 top-1/2 -translate-y-1/2 hidden md:flex pointer-events-auto transition-opacity duration-300 ${open ? 'opacity-0' : 'opacity-100'}`}>
             <Link 

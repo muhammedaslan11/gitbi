@@ -9,7 +9,8 @@ export default function Footer() {
   return (
     <footer
       id="footer"
-      className="relative w-full flex flex-col justify-end mt-24 md:mt-32 lg:mt-48 xl:mt-64"
+      className="relative w-full flex flex-col justify-end mt-24 md:mt-32 lg:mt-48 xl:mt-64 bg-white"
+      style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
     >
       <div className="mt-4 mb-6 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 px-4">
         {navItems.map((item) => (

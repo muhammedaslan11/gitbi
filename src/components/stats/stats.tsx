@@ -235,7 +235,7 @@ const Stats: React.FC = () => {
   }, [isMobile, shouldAnimateCounters]);
 
   return (
-    <section className="relative" id="stats">
+    <section className="relative bg-white" id="stats">
       <Typography.H1 className="text-center font-wc-rough-trad font-normal text-blue-800 text-[clamp(3.5rem,5vw,6rem)]">
         STATS
       </Typography.H1>
