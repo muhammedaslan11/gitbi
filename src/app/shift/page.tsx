@@ -12,6 +12,7 @@ export default function ShiftPage() {
   const [view, setView] = useState<View>("form")
   const [participants, setParticipants] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [userName, setUserName] = useState<string | null>(null)
 
   const fetchParticipants = async () => {
     setIsLoading(true)
@@ -28,11 +29,26 @@ export default function ShiftPage() {
 
   useEffect(() => {
     fetchParticipants()
-    const name = localStorage.getItem("gitbi-shift-name")
-    if (name) {
-      setView("welcome")
-    }
   }, [])
+
+  useEffect(() => {
+    if (isLoading) return
+
+    const savedName = localStorage.getItem("gitbi-shift-name")
+    if (savedName) {
+      const exists = participants.some(p => p.name === savedName)
+      if (exists) {
+        setUserName(savedName)
+        setView("welcome")
+      } else {
+        // Sync mismatch: DB was likely cleared
+        localStorage.removeItem("gitbi-shift-name")
+        localStorage.removeItem("gitbi-shift-slots")
+        setUserName(null)
+        setView("form")
+      }
+    }
+  }, [participants, isLoading])
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" })
@@ -88,7 +104,9 @@ export default function ShiftPage() {
           <div className="bg-gray-50 border border-gray-100 rounded-2xl p-6 md:p-10 text-center">
             <div className="flex flex-col items-center gap-6">
               <div>
-                <h2 className="font-wc-rough-trad text-[#0a0a0a] text-2xl md:text-4xl uppercase mb-2">Tekrar Selam!</h2>
+                <h2 className="font-averta-std font-black text-[#0a0a0a] text-2xl md:text-4xl uppercase mb-2">
+                  Tekrar Selam{userName ? `, ${userName.split(" ")[0]}` : ""}!
+                </h2>
                 <p className="font-averta-std text-black/40 text-sm">Kaydın zaten mevcut. Ne yapmak istersin?</p>
               </div>
               <div className="flex flex-col gap-3 w-full pt-2">
@@ -133,7 +151,7 @@ export default function ShiftPage() {
                 </svg>
               </div>
               <div>
-                <h2 className="font-wc-rough-trad text-[#0a0a0a] text-2xl md:text-4xl uppercase mb-2">Harikasın!</h2>
+                <h2 className="font-averta-std font-black text-[#0a0a0a] text-2xl md:text-4xl uppercase mb-2">Harikasın!</h2>
                 <p className="font-averta-std text-black/40 text-sm max-w-xs mx-auto">Müsaitliğin kaydedildi. Ekibin tablosuna göz at.</p>
               </div>
               <div className="flex flex-col gap-3 w-full pt-2">
@@ -157,9 +175,24 @@ export default function ShiftPage() {
         {/* Results */}
         {view === "results" && (
           <div>
-            <div className="mb-6 text-right">
-              <h2 className="font-wc-rough-trad text-[#0a0a0a] text-2xl md:text-3xl uppercase leading-none">Analiz</h2>
-              <p className="text-[#0035d5]/70 text-[9px] font-bold uppercase tracking-[0.25em] mt-0.5">Ekip Müsaitlik Haritası</p>
+            <div className="mb-6 flex items-start justify-between">
+              {/* Back Button */}
+              <button 
+                onClick={() => setView(userName ? "welcome" : "form")}
+                className="flex items-center gap-2 text-black/20 hover:text-black/60 transition-all group py-1"
+              >
+                <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center border border-gray-100 group-hover:border-gray-200 group-hover:bg-white transition-all shadow-sm">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="group-hover:-translate-x-0.5 transition-transform">
+                    <path d="M15 18l-6-6 6-6" />
+                  </svg>
+                </div>
+                <span className="text-[9px] font-black uppercase tracking-[0.2em]">Geri Dön</span>
+              </button>
+
+              <div className="text-right">
+                <h2 className="font-averta-std font-black text-[#0a0a0a] text-2xl md:text-3xl uppercase leading-none">Analiz</h2>
+                <p className="text-[#0035d5]/70 text-[9px] font-bold uppercase tracking-[0.25em] mt-0.5">Ekip Müsaitlik Haritası</p>
+              </div>
             </div>
 
             <div className="bg-gray-50 border border-gray-100 rounded-2xl p-4 md:p-8">

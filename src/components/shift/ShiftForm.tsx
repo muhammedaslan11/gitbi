@@ -83,21 +83,38 @@ export default function ShiftForm({ onSave, participants }: ShiftFormProps) {
   return (
     <div className="space-y-6">
 
-      {/* Kimsin — dropdown */}
+      {/* İsim — Selection */}
       <div>
-        <label className={labelBase}>Kimsin</label>
-        <select
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          className={`${inputBase} text-base font-semibold`}
-        >
-          <option value="">İsim seçin...</option>
-          {teamItems.map((member) => (
-            <option key={member.title} value={member.title} className="bg-white">
-              {member.title}
-            </option>
-          ))}
-        </select>
+        <label className={labelBase}>İsim</label>
+        {name && typeof window !== "undefined" && localStorage.getItem("gitbi-shift-name") === name ? (
+          <div className="flex items-center justify-between bg-white border border-gray-200 rounded-xl px-4 py-3 shadow-sm group">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-[#0035d5]/10 flex items-center justify-center text-[#0035d5] font-black text-xs group-hover:bg-[#0035d5] group-hover:text-white transition-all">
+                {name.charAt(0)}
+              </div>
+              <span className="font-bold text-[#0a0a0a]">{name}</span>
+            </div>
+            <button 
+              onClick={() => setName("")}
+              className="text-[10px] font-black uppercase tracking-widest text-black/20 hover:text-red-500 transition-all"
+            >
+              Değiştir
+            </button>
+          </div>
+        ) : (
+          <select
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className={`${inputBase} text-base font-semibold`}
+          >
+            <option value="">İsim seçin...</option>
+            {teamItems.map((member) => (
+              <option key={member.title} value={member.title} className="bg-white">
+                {member.title}
+              </option>
+            ))}
+          </select>
+        )}
       </div>
 
       {/* Slot ekleme */}
