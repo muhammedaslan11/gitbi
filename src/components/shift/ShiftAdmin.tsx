@@ -80,25 +80,29 @@ export default function ShiftAdmin({ participants }: ShiftAdminProps) {
         }
         merged.push(current)
       }
-      allRangesByDay[day] = merged
+      allRangesByDay[day] = merged.map(r => {
+        const duration = timeToMinutes(r.end) - timeToMinutes(r.start)
+        return { ...r, duration, score: r.count * duration }
+      })
     })
 
-    let absoluteWinner: any = null
-    if (maxOverallCount > 0) {
-      for (const day of DAYS) {
-        const winnersOnDay = allRangesByDay[day].filter(r => r.count === maxOverallCount).sort((a, b) => a.startMin - b.startMin)
-        if (winnersOnDay.length > 0) {
-          absoluteWinner = { ...winnersOnDay[0], range: `${winnersOnDay[0].start}–${winnersOnDay[0].end}` }
-          break
-        }
-      }
-    }
-    const alternatives = DAYS.flatMap(day => allRangesByDay[day])
+    const allFlattenedRanges = DAYS.flatMap(day => allRangesByDay[day])
+    
+    // Smart Winner Selection: Prioritize (Count * Duration)
+    const sortedByScore = [...allFlattenedRanges].sort((a, b) => b.score - a.score || b.count - a.count)
+    
+    const absoluteWinner = sortedByScore.length > 0 ? { 
+      ...sortedByScore[0], 
+      range: `${sortedByScore[0].start}–${sortedByScore[0].end}` 
+    } : null
+
+    const alternatives = allFlattenedRanges
       .filter(r => r.count > 1)
       .filter(r => !(absoluteWinner && r.day === absoluteWinner.day && r.start === absoluteWinner.start && r.end === absoluteWinner.end))
-      .sort((a, b) => b.count - a.count || DAYS.indexOf(a.day) - DAYS.indexOf(b.day) || a.startMin - b.startMin)
+      .sort((a, b) => b.score - a.score || b.count - a.count)
       .slice(0, 2)
-    return { allRangesByDay, maxOverallCount, absoluteWinner, alternatives }
+
+    return { allRangesByDay, absoluteWinner, alternatives }
   }, [participants])
 
   const bestSlots = useMemo(() => getOverlapData.absoluteWinner ? [getOverlapData.absoluteWinner] : [], [getOverlapData])
