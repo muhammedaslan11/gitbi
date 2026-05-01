@@ -28,6 +28,8 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.png" type="image/png" sizes="any" />
         <link rel="shortcut icon" href="/favicon.png" type="image/png" />
         <link rel="apple-touch-icon" href="/favicon.png" />
+        <meta name="theme-color" content="#000000" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <Script
           async
           src={`https://www.googletagmanager.com/gtag/js?id=${process.env.GOOGLE_ANALYTICS_MEASUREMENT_ID}`}
@@ -44,7 +46,7 @@ export default function RootLayout({
         </Script>
       </head>
       <body
-        className={` ${avertaStd.variable} ${grutchShaded.variable} ${museo.variable} ${sketchBlock.variable} ${wcRoughTrad.variable} ${cabinSketch.variable}  antialiased`}
+        className={` ${avertaStd.variable} ${grutchShaded.variable} ${museo.variable} ${sketchBlock.variable} ${wcRoughTrad.variable} ${cabinSketch.variable} bg-[#000000] antialiased`}
       >
         <HOC>{children}</HOC>
         <Analytics />

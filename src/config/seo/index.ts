@@ -3,7 +3,7 @@ const description =
   "GİTBİ (Girişimcilik İnsanlar Topluluğu), teknoloji ve girişimcilik dünyasını bir araya getiren, inovasyonu ve iş birliğini odağına alan dinamik bir topluluktur."
 
 const title = {
-  default: "GİTBİ | Girişimcilik İnsanlar Topluluğu",
+  default: "GİTBİ | Girişimci İnsanlar Topluluğu",
   template: `%s | GİTBİ`,
 }
 const url = "https://gitbi.org/" // Placeholder or best guess
