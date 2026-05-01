@@ -44,7 +44,7 @@ export default function ShiftForm({ onSave, participants }: ShiftFormProps) {
     )
     if (existing) {
       setSlots(existing.slots)
-      setError("Eski kaydın bulundu, verilerin yüklendi. ⚡")
+      setError("Eski kaydın bulundu, verilerin yüklendi.")
       setTimeout(() => setError(null), 3000)
     }
   }, [name, participants])
