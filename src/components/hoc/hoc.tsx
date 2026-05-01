@@ -8,12 +8,12 @@ import Preloader from '../preloader/preloader';
 
 function HOC({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const isTeamPage = pathname === '/ekip';
+  const isShiftPage = pathname === '/shift';
 
   return (
     <>
       <Preloader />
-      <Navbar />
+      {!isShiftPage && <Navbar />}
       <ReactLenis
         root
         options={{
@@ -24,7 +24,7 @@ function HOC({ children }: { children: React.ReactNode }) {
       >
         {children}
       </ReactLenis>
-      <Footer />
+      {!isShiftPage && <Footer />}
     </>
   );
 }
