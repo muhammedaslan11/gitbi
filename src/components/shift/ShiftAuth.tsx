@@ -83,7 +83,7 @@ export default function ShiftAuth({ onAuthenticated }: ShiftAuthProps) {
         {code.map((digit, idx) => (
           <input
             key={idx}
-            ref={(el) => (inputs.current[idx] = el)}
+            ref={(el) => { inputs.current[idx] = el }}
             type="text"
             inputMode="numeric"
             maxLength={1}
