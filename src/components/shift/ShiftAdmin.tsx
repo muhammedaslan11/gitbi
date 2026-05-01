@@ -93,7 +93,7 @@ export default function ShiftAdmin({ participants }: ShiftAdminProps) {
     )
   }
 
-  const { winner, alternatives } = getOverlapData
+  const { winner, alternatives, allRangesByDay } = getOverlapData
 
   return (
     <div className="space-y-10">
@@ -105,7 +105,7 @@ export default function ShiftAdmin({ participants }: ShiftAdminProps) {
         {winner ? (
           <div className="space-y-3">
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <span className="text-5xl md:text-7xl font-wc-rough-trad text-[#0a0a0a] uppercase leading-none">{winner.day}</span>
+              <span className="text-5xl md:text-7xl font-averta-std font-black text-[#0a0a0a] uppercase leading-none">{winner.day}</span>
               <span className="text-2xl md:text-4xl font-averta-std font-black text-[#0035d5]">{winner.range}</span>
             </div>
             <p className="text-[10px] text-black/30 font-black uppercase tracking-[0.2em]">{winner.count} kişi müsait</p>
@@ -169,46 +169,50 @@ export default function ShiftAdmin({ participants }: ShiftAdminProps) {
                       />
                     ))}
 
-                    {/* Individual availability bars */}
-                    {daySlots.map((slot, idx) => (
-                      <div
-                        key={idx}
-                        className="absolute top-1 bottom-1 bg-[#0035d5]/10 border-l-2 border-[#0035d5]/30 rounded-sm"
-                        style={{
-                          left: `${getPercentage(slot.start)}%`,
-                          width: `${getWidthPercentage(slot.start, slot.end)}%`,
-                        }}
-                      />
-                    ))}
-
-                    {/* Winner highlight */}
-                    {isWinnerDay && winner && (
-                      <div
-                        className="absolute inset-y-0 bg-[#0035d5]/20 border-l-[3px] border-[#0035d5] cursor-pointer hover:bg-[#0035d5]/30 transition-all"
-                        style={{
-                          left: `${getPercentage(winner.start)}%`,
-                          width: `${getWidthPercentage(winner.start, winner.end)}%`,
-                        }}
-                        onClick={() => setSelectedRange({ day, range: winner.range, members: winner.members })}
-                      >
-                        <div className="h-full flex flex-col items-center justify-center px-1">
-                          <span className="text-[7px] font-black text-[#0035d5] uppercase leading-none">ORTAK</span>
+                    {/* All merged availability ranges */}
+                    {allRangesByDay[day]?.map((range: any, idx: number) => {
+                      const isWinner = winner && winner.day === day && winner.start === range.start && winner.end === range.end
+                      const width = getWidthPercentage(range.start, range.end)
+                      const isAlternative = alternatives.some(a => a.day === day && a.start === range.start && a.end === range.end)
+                      
+                      return (
+                        <div
+                          key={idx}
+                          className={`absolute inset-y-0 border-l rounded-sm cursor-pointer transition-all flex items-center px-1.5 overflow-hidden group/range
+                            ${isWinner 
+                              ? "bg-[#0035d5]/30 border-[#0035d5] z-30" 
+                              : isAlternative 
+                                ? "bg-[#0035d5]/15 border-[#0035d5]/50 z-20" 
+                                : "bg-[#0035d5]/5 border-[#0035d5]/10 z-10 hover:bg-[#0035d5]/10"
+                            }`}
+                          style={{
+                            left: `${getPercentage(range.start)}%`,
+                            width: `${width}%`,
+                          }}
+                          onClick={() => setSelectedRange({ day, range: `${range.start}–${range.end}`, members: range.members })}
+                        >
+                          <div className="flex flex-wrap gap-x-1 items-center leading-none">
+                            {isWinner && width > 15 && (
+                              <span className="text-[7px] font-black text-[#0035d5] uppercase mr-1 bg-[#0035d5]/10 px-1 rounded-sm">ORTAK</span>
+                            )}
+                            
+                            {range.members.length > 2 && width < 20 ? (
+                              <span className="text-[6px] font-black text-[#0035d5]/60 uppercase whitespace-nowrap">
+                                {range.members[0].split(' ')[0]} +{range.members.length - 1}
+                              </span>
+                            ) : width < 10 ? (
+                              <span className="text-[6px] font-black text-[#0035d5]/60 uppercase">+{range.members.length}</span>
+                            ) : (
+                              range.members.map((m: string, mIdx: number) => (
+                                <span key={mIdx} className="text-[6px] font-black text-[#0035d5]/60 uppercase whitespace-nowrap">
+                                  {m.split(' ')[0]}{mIdx < range.members.length - 1 ? ',' : ''}
+                                </span>
+                              ))
+                            )}
+                          </div>
                         </div>
-                      </div>
-                    )}
-
-                    {/* Alternative highlights */}
-                    {altHighlights.map((alt, i) => (
-                      <div
-                        key={i}
-                        className="absolute inset-y-0 bg-[#0035d5]/10 border-l-[2px] border-dashed border-[#0035d5]/50 cursor-pointer hover:bg-[#0035d5]/20 transition-all"
-                        style={{
-                          left: `${getPercentage(alt.start)}%`,
-                          width: `${getWidthPercentage(alt.start, alt.end)}%`,
-                        }}
-                        onClick={() => setSelectedRange({ day, range: `${alt.start}–${alt.end}`, members: alt.members })}
-                      />
-                    ))}
+                      )
+                    })}
                   </div>
                 </div>
               )
@@ -225,7 +229,7 @@ export default function ShiftAdmin({ participants }: ShiftAdminProps) {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="space-y-2">
-              <h4 className="font-wc-rough-trad text-[#0a0a0a] text-4xl md:text-6xl uppercase leading-none">{selectedRange.day}</h4>
+              <h4 className="font-averta-std font-black text-[#0a0a0a] text-4xl md:text-6xl uppercase leading-none">{selectedRange.day}</h4>
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 bg-[#0035d5] rounded-full" />
                 <p className="text-base text-[#0035d5] font-averta-std font-black uppercase tracking-[0.15em]">{selectedRange.range}</p>

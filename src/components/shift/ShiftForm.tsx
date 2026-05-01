@@ -26,6 +26,7 @@ export default function ShiftForm({ onSave, participants }: ShiftFormProps) {
   })
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [isAdded, setIsAdded] = useState(false)
 
   useEffect(() => {
     const savedName = localStorage.getItem("gitbi-shift-name")
@@ -55,6 +56,8 @@ export default function ShiftForm({ onSave, participants }: ShiftFormProps) {
       return
     }
     setSlots([...slots, currentSlot])
+    setIsAdded(true)
+    setTimeout(() => setIsAdded(false), 1500)
   }
 
   const removeSlot = (index: number) => {
@@ -83,21 +86,38 @@ export default function ShiftForm({ onSave, participants }: ShiftFormProps) {
   return (
     <div className="space-y-6">
 
-      {/* Kimsin — dropdown */}
+      {/* İsim — Selection */}
       <div>
-        <label className={labelBase}>Kimsin</label>
-        <select
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          className={`${inputBase} text-base font-semibold`}
-        >
-          <option value="">İsim seçin...</option>
-          {teamItems.map((member) => (
-            <option key={member.title} value={member.title} className="bg-white">
-              {member.title}
-            </option>
-          ))}
-        </select>
+        <label className={labelBase}>İsim</label>
+        {name && typeof window !== "undefined" && localStorage.getItem("gitbi-shift-name") === name ? (
+          <div className="flex items-center justify-between bg-white border border-gray-200 rounded-xl px-4 py-3 shadow-sm group">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-[#0035d5]/10 flex items-center justify-center text-[#0035d5] font-black text-xs group-hover:bg-[#0035d5] group-hover:text-white transition-all">
+                {name.charAt(0)}
+              </div>
+              <span className="font-bold text-[#0a0a0a]">{name}</span>
+            </div>
+            <button 
+              onClick={() => setName("")}
+              className="text-[10px] font-black uppercase tracking-widest text-black/20 hover:text-red-500 transition-all"
+            >
+              Değiştir
+            </button>
+          </div>
+        ) : (
+          <select
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className={`${inputBase} text-base font-semibold`}
+          >
+            <option value="">İsim seçin...</option>
+            {teamItems.map((member) => (
+              <option key={member.title} value={member.title} className="bg-white">
+                {member.title}
+              </option>
+            ))}
+          </select>
+        )}
       </div>
 
       {/* Slot ekleme */}
@@ -149,9 +169,13 @@ export default function ShiftForm({ onSave, participants }: ShiftFormProps) {
 
         <button
           onClick={addSlot}
-          className="w-full py-3 rounded-lg border border-dashed border-gray-200 text-black/30 hover:text-black/60 hover:border-gray-300 active:scale-[0.98] transition-all font-averta-std font-black uppercase tracking-widest text-[10px]"
+          className={`w-full py-3 rounded-lg border border-dashed transition-all font-averta-std font-black uppercase tracking-widest text-[10px] active:scale-[0.98] 
+            ${isAdded 
+              ? "bg-[#0035d5] border-[#0035d5] text-white shadow-lg shadow-[#0035d5]/20" 
+              : "border-gray-200 text-black/30 hover:text-black/60 hover:border-gray-300"
+            }`}
         >
-          + Listeye Ekle
+          {isAdded ? "✓ Listeye Eklendi" : "+ Listeye Ekle"}
         </button>
       </div>
 
@@ -168,33 +192,46 @@ export default function ShiftForm({ onSave, participants }: ShiftFormProps) {
           </div>
 
           <div className="grid gap-2">
-            {slots.map((s, i) => (
-              <div
-                key={i}
-                className="group flex items-center justify-between px-3.5 py-3 rounded-xl bg-white border border-gray-100 hover:border-gray-200 transition-all"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-[#0035d5]/10 flex items-center justify-center text-[#0035d5] shrink-0">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <circle cx="12" cy="12" r="10" />
-                      <polyline points="12 6 12 12 16 14" />
-                    </svg>
+            {[...slots]
+              .sort((a, b) => {
+                const dayDiff = DAYS.indexOf(a.day) - DAYS.indexOf(b.day)
+                if (dayDiff !== 0) return dayDiff
+                return timeToMinutes(a.start) - timeToMinutes(b.start)
+              })
+              .map((s, i) => {
+                // We need to find the actual index in the original array for removal
+                const originalIndex = slots.findIndex(orig => 
+                  orig.day === s.day && orig.start === s.start && orig.end === s.end
+                )
+                return (
+                  <div
+                    key={i}
+                    className="group flex items-center justify-between px-3.5 py-3 rounded-xl bg-white border border-gray-100 hover:border-gray-200 transition-all"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-[#0035d5]/10 flex items-center justify-center text-[#0035d5] shrink-0">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <circle cx="12" cy="12" r="10" />
+                          <polyline points="12 6 12 12 16 14" />
+                        </svg>
+                      </div>
+                      <div>
+                        <div className="text-[9px] text-black/30 font-black uppercase tracking-widest">{s.day}</div>
+                        <div className="text-sm font-bold text-[#0a0a0a]">{s.start} – {s.end}</div>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => removeSlot(originalIndex)}
+                      className="group/del w-9 h-9 rounded-xl flex items-center justify-center text-red-500/30 hover:text-red-500 hover:bg-red-50 transition-all active:scale-90"
+                      title="Sil"
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="group-hover/del:rotate-12 transition-transform">
+                        <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2M10 11v6M14 11v6" />
+                      </svg>
+                    </button>
                   </div>
-                  <div>
-                    <div className="text-[9px] text-black/30 font-black uppercase tracking-widest">{s.day}</div>
-                    <div className="text-sm font-bold text-[#0a0a0a]">{s.start} – {s.end}</div>
-                  </div>
-                </div>
-                <button
-                  onClick={() => removeSlot(i)}
-                  className="w-7 h-7 rounded-full flex items-center justify-center text-red-400/50 hover:text-red-500 hover:bg-red-50 transition-all"
-                >
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                    <path d="M18 6L6 18M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-            ))}
+                )
+              })}
           </div>
         </div>
       )}
