@@ -20,7 +20,7 @@ export default function ShiftAdmin({ participants }: ShiftAdminProps) {
   // Hour labels: every 2 hours for readability
   const hours = useMemo(() => {
     const arr = []
-    for (let h = DAY_START; h <= DAY_END; h += 2) {
+    for (let h = DAY_START; h < DAY_END; h += 2) {
       arr.push(`${String(h).padStart(2, "0")}:00`)
     }
     return arr
@@ -69,12 +69,14 @@ export default function ShiftAdmin({ participants }: ShiftAdminProps) {
     })
 
     const flat = DAYS.flatMap(day => allRangesByDay[day])
-    const sorted = [...flat].sort((a, b) => b.score - a.score || b.count - a.count)
+    // Sort by count (priority) and then by duration
+    const sorted = [...flat].sort((a, b) => b.count - a.count || b.duration - a.duration)
     const winner = sorted.length > 0 ? { ...sorted[0], range: `${sorted[0].start}–${sorted[0].end}` } : null
+    
     const alternatives = flat
       .filter(r => r.count > 1)
       .filter(r => !(winner && r.day === winner.day && r.start === winner.start && r.end === winner.end))
-      .sort((a, b) => b.score - a.score || b.count - a.count)
+      .sort((a, b) => b.count - a.count || b.duration - a.duration)
       .slice(0, 2)
 
     return { allRangesByDay, winner, alternatives }
@@ -96,23 +98,51 @@ export default function ShiftAdmin({ participants }: ShiftAdminProps) {
   const { winner, alternatives, allRangesByDay } = getOverlapData
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-8">
 
-      {/* Winner card */}
-      <div className="bg-gray-50 border border-gray-100 rounded-2xl p-6 md:p-10 flex flex-col items-center gap-4 text-center">
-        <p className="text-[9px] font-black text-black/20 uppercase tracking-[0.5em]">En Uygun Toplantı Zamanı</p>
-        <div className="w-8 h-0.5 bg-[#0035d5]/30 rounded-full" />
-        {winner ? (
-          <div className="space-y-3">
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <span className="text-5xl md:text-7xl font-averta-std font-black text-[#0a0a0a] uppercase leading-none">{winner.day}</span>
-              <span className="text-2xl md:text-4xl font-averta-std font-black text-[#0035d5]">{winner.range}</span>
+      <div className="grid md:grid-cols-3 gap-4">
+        {/* Winner card */}
+        <div className="md:col-span-2 bg-gray-50 border border-gray-100 rounded-2xl p-6 md:p-8 flex flex-col items-center justify-center gap-4 text-center">
+          <p className="text-[9px] font-black text-black/20 uppercase tracking-[0.5em]">En Uygun Toplantı Zamanı</p>
+          <div className="w-8 h-0.5 bg-[#0035d5]/30 rounded-full" />
+          {winner ? (
+            <div className="space-y-2">
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                <span className="text-4xl md:text-5xl font-averta-std font-black text-[#0a0a0a] uppercase leading-none">{winner.day}</span>
+                <span className="text-xl md:text-2xl font-averta-std font-black text-[#0035d5]">{winner.range}</span>
+              </div>
+              <p className="text-[10px] text-black/30 font-black uppercase tracking-[0.2em]">{winner.count} kişi müsait</p>
             </div>
-            <p className="text-[10px] text-black/30 font-black uppercase tracking-[0.2em]">{winner.count} kişi müsait</p>
+          ) : (
+            <p className="text-lg font-averta-std font-black text-black/20 uppercase">Çakışma bekleniyor</p>
+          )}
+        </div>
+
+        {/* Alternatives side card */}
+        <div className="bg-gray-50/50 border border-gray-100 rounded-2xl p-5 md:p-6 flex flex-col gap-4">
+          <p className="text-[8px] font-black text-black/20 uppercase tracking-[0.3em]">Alternatifler</p>
+          <div className="space-y-2">
+            {alternatives.length > 0 ? (
+              alternatives.map((alt, i) => (
+                <div 
+                  key={i} 
+                  onClick={() => setSelectedRange({ day: alt.day, range: `${alt.start}–${alt.end}`, members: alt.members })}
+                  className="p-3 bg-white border border-gray-100 rounded-xl cursor-pointer hover:border-[#0035d5]/30 hover:shadow-sm transition-all group"
+                >
+                  <div className="flex justify-between items-start mb-1">
+                    <span className="text-[10px] font-black text-[#0a0a0a] uppercase">{alt.day}</span>
+                    <span className="text-[8px] font-bold text-[#0035d5]">{alt.count} Kişi</span>
+                  </div>
+                  <div className="text-xs font-bold text-black/40 group-hover:text-[#0035d5] transition-colors">{alt.start} – {alt.end}</div>
+                </div>
+              ))
+            ) : (
+              <div className="py-4 text-center">
+                <p className="text-[9px] font-bold text-black/10 uppercase italic">Alternatif bulunamadı</p>
+              </div>
+            )}
           </div>
-        ) : (
-          <p className="text-lg font-averta-std font-black text-black/20 uppercase">Çakışma bekleniyor</p>
-        )}
+        </div>
       </div>
 
       {/* Horizontal calendar */}
