@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import TransitionScribble from '@/components/ui/transition-scribble';
 import confetti from 'canvas-confetti';
 
 export default function BasvuruPage() {
@@ -11,6 +10,7 @@ export default function BasvuruPage() {
     phone: '',
     department: '',
     university: '',
+    description: '',
   });
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
@@ -49,14 +49,12 @@ export default function BasvuruPage() {
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   return (
     <main className="min-h-screen relative overflow-hidden bg-white flex items-center justify-center py-20 px-6">
-      <TransitionScribble autoRun={true} />
-      
       {/* Subtle Blue Glow Background - Refined for Light Theme */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 blur-[120px] rounded-full pointer-events-none" />
 
@@ -173,6 +171,21 @@ export default function BasvuruPage() {
                     className="w-full bg-gray-50 border border-gray-200 rounded-2xl px-6 py-4 font-averta-std text-gray-900 focus:outline-none focus:border-primary/50 focus:bg-white focus:ring-4 focus:ring-primary/5 transition-all placeholder:text-gray-300"
                   />
                 </div>
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <label htmlFor="description" className="font-averta-std font-bold text-gray-400 text-[10px] uppercase tracking-[0.2em] pl-1">
+                  Açıklama / Mesaj
+                </label>
+                <textarea
+                  id="description"
+                  name="description"
+                  value={formData.description}
+                  onChange={handleChange}
+                  placeholder="Bize biraz kendinden bahset..."
+                  rows={4}
+                  className="w-full bg-gray-50 border border-gray-200 rounded-2xl px-6 py-4 font-averta-std text-gray-900 focus:outline-none focus:border-primary/50 focus:bg-white focus:ring-4 focus:ring-primary/5 transition-all placeholder:text-gray-300 resize-none"
+                />
               </div>
 
               {status === 'error' && (

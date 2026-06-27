@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
-import { getFirebaseAdmin } from '@/lib/firebase-admin';
+import { pb } from '@/lib/pocketbase';
 
 export async function POST(request: Request) {
   try {
     const data = await request.json();
-    const { fullName, email, phone, department, university } = data;
+    const { fullName, email, phone, department, university, description } = data;
 
     // 1. Temel validasyon
     if (!fullName || !email || !phone || !department || !university) {
@@ -23,34 +23,19 @@ export async function POST(request: Request) {
       );
     }
 
-    // 3. Firebase Admin'e bağlan
-    const db = getFirebaseAdmin();
-
-    if (!db) {
-      console.error('Firebase DB connection failed - Check environment variables');
-      // Geliştirme aşamasında kullanıcıyı uyarmak için
-      return NextResponse.json(
-        { error: 'Sunucu yapılandırması eksik (Firebase API Anahtarları).' },
-        { status: 500 }
-      );
-    }
-
-    // 4. Firestore'a kaydet
-    const docRef = await db.collection('basvurular').add({
-      fullName,
-      email,
+    // 3. PocketBase'e kaydet
+    const record = await pb.collection('gitbiforms').create({
+      name: fullName,
       phone,
+      email,
+      organisation: university,
       department,
-      university,
-      createdAt: new Date().toISOString(),
-      status: 'new' // Başvurunun durumunu takip etmek için
+      description: description || '',
     });
 
-    console.log('Document written with ID: ', docRef.id);
-
-    return NextResponse.json({ 
+    return NextResponse.json({
       message: 'Başvurunuz başarıyla alındı!',
-      id: docRef.id 
+      id: record.id,
     });
 
   } catch (error) {

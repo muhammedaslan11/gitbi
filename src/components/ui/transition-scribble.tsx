@@ -122,24 +122,11 @@ const TransitionScribble = forwardRef<TransitionScribbleHandle, TransitionScribb
         if (logoWrapper) {
             drawTl.set(logoWrapper, { autoAlpha: 0 }, 0);
             drawTl.to(logoWrapper, {
-                autoAlpha: 1, duration: durIn * 0.5, ease: 'power2.out',
-                onStart: () => {
-                    const innerElem = logoWrapper.querySelector('svg, img, div');
-                    if (innerElem) {
-                        gsap.to(innerElem, { rotation: 5, duration: 0.15, repeat: -1, yoyo: true, ease: 'steps(1)', overwrite: 'auto' });
-                    }
-                }
+                autoAlpha: 1, duration: durIn * 0.5, ease: 'power2.out'
             }, durIn * 0.5);
 
             drawTl.set(logoWrapper, {
-                autoAlpha: 0,
-                onComplete: () => {
-                    const innerElem = logoWrapper.querySelector('svg, img, div');
-                    if (innerElem) {
-                        gsap.killTweensOf(innerElem);
-                        gsap.set(innerElem, { rotation: 0 });
-                    }
-                }
+                autoAlpha: 0
             }, durIn + delayMiddle + (durOut * 0.48));
         }
     };

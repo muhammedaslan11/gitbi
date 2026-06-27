@@ -24,13 +24,13 @@ const Preloader = () => {
             autoRun={true} 
             onComplete={() => setIsVisible(false)}
             logo={
-                <div className="flex flex-col items-center select-none font-bold">
-                    <div 
-                        className="text-6xl md:text-8xl tracking-[0.2em] leading-none"
-                        style={{ fontFamily: 'var(--font-museo)', marginLeft: '0.2em' }}
-                    >
-                        GITB!
-                    </div>
+                <div className="flex items-center select-none">
+                    <span className="font-sketch-block font-normal text-primary text-6xl md:text-8xl leading-none">
+                        GIT
+                    </span>
+                    <span className="font-grutch-shaded font-normal text-6xl md:text-8xl leading-none">
+                        B!
+                    </span>
                 </div>
             }
         />
