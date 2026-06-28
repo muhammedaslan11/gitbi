@@ -9,7 +9,7 @@ const socialItems = [
 ]
 
 export default function Navbar() {
-  
+
   // Transform standard navItems to the format expected by StaggeredMenu
   const menuItems = navItems.map((item: { name: string; href: string }) => ({
     label: item.name,
@@ -27,13 +27,13 @@ export default function Navbar() {
           name: 'inalbaransel',
           link: 'https://github.com/inalbaransel',
           avatarUrl: 'https://github.com/inalbaransel.png',
-          status: 'Available for projects'
+          status: 'Available for Projects'
         },
         {
-          name: 'muhammedaslan11',
-          link: 'https://github.com/muhammedaslan11',
-          avatarUrl: 'https://github.com/muhammedaslan11.png',
-          status: 'Available for projects'
+          name: 'Muhammed Ali',
+          link: 'https://muhammedaslan.net/?utm_source=gitbi',
+          avatarUrl: '/ekip/muhammedali.png',
+          status: 'Available for Partnerships'
         }
       ]}
       displaySocials={true}

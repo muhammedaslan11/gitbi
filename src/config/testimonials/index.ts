@@ -10,70 +10,68 @@ export const globeLogo =
 export const testimonialInfo = [
   {
     id: 1,
-    title: 'Üye — Proje Ekibi',
-    img: 'https://res.cloudinary.com/dscnitrourkela/image/upload/v1756325955/hacknitr/bj1j3roiopyr95dspizq.jpg',
-    subtitle: '@gitbi',
-    content: `
-              GİTBİ'ye katılmadan önce ne yapacağımı bilmiyordum. İlk sprint'te gerçek bir projeye dahil oldum.
-              Şimdi kendi ekibimi yönetiyorum. Bu deneyimi başka hiçbir yerde kazanamazdım.
-            `,
+    title: 'Hüseyin',
+    img: '/ekip/sefs.png',
+    subtitle: '@huseyin · Founder & Team Lead',
+    content:
+      "GİTBİ'yi kurarken aklımdaki tek şey gerçek bir ekip kültürü oluşturmaktı. Bugün gördüğüm tablo, hayalini kurduğumdan çok daha büyük: birbirine sahip çıkan, gerçekten üreten bir topluluk olduk.",
     time: '10:00 AM',
-    date: 'Nis 2025',
-    hacknitr: 'GİTBİ',
-  },
-  {
-    id: 2,
-    title: 'Üye — Networking',
-    img: 'https://res.cloudinary.com/dscnitrourkela/image/upload/v1756326007/hacknitr/nd8wpenegy73yapip03s.jpg',
-    subtitle: '@gitbi',
-    content:
-      "GİTBİ'de tanıştığım insanlar benim için bir network değil, gerçek bir ekip oldu. Birlikte ürettiklerimiz CV'de değil, hayatımda yer aldı.",
-    time: '3:30 PM',
-    date: 'Mar 2025',
-    hacknitr: 'GİTBİ',
-  },
-  {
-    id: 3,
-    title: 'Üye — Hackathon',
-    img: 'https://res.cloudinary.com/dscnitrourkela/image/upload/v1756326028/hacknitr/otdamfkqfpaar6fwbh1f.jpg',
-    subtitle: '@gitbi',
-    content:
-      "İlk hackathonuma GİTBİ ekibiyle girdim. 24 saatte gerçek bir ürün çıkardık. Teoride öğrendiğimin 10 katını o 24 saatte öğrendim.",
-    time: '9:00 AM',
-    date: 'Şub 2025',
-    hacknitr: 'GİTBİ',
-  },
-  {
-    id: 4,
-    title: 'Üye — Sprint Lideri',
-    img: 'https://res.cloudinary.com/dscnitrourkela/image/upload/v1756326067/hacknitr/r5ozi4og2pbj2gdcr1w6.jpg',
-    subtitle: '@gitbi',
-    content:
-      "2. ayımda 5 kişilik ekibe sprint liderliği yaptım. Bunu bir ders olarak değil, gerçek bir sorumluluk olarak yaşadım. GİTBİ beni hazırladı.",
-    time: '11:45 AM',
     date: 'Oca 2025',
     hacknitr: 'GİTBİ',
   },
   {
-    id: 5,
-    title: 'Üye — Workshop',
-    img: 'https://res.cloudinary.com/dscnitrourkela/image/upload/v1756326094/hacknitr/jcaeyorourckv6grzlt6.jpg',
-    subtitle: '@gitbi',
+    id: 2,
+    title: 'Rabia',
+    img: '/ekip/rabia.png',
+    subtitle: '@rabia · Team Lead, Media Lead',
     content:
-      "6. ayımda kendi workshop'umu verdim. Bunun mümkün olduğunu düşünmezdim. GİTBİ'nin kültürü seni büyümeye zorluyor, farkında bile olmadan.",
+      "Medya ekibini yönetmek bana hem yaratıcılığımı hem liderlik becerilerimi geliştirme şansı verdi. GİTBİ'de attığımız her içerik, tek kişinin değil gerçek bir ekip emeğinin ürünü.",
+    time: '3:30 PM',
+    date: 'Şub 2025',
+    hacknitr: 'GİTBİ',
+  },
+  {
+    id: 3,
+    title: 'Muhammed Ali',
+    img: '/ekip/muhammedali.png',
+    subtitle: '@muhammedali · Founder, Creative Developer',
+    content:
+      "Kod yazmayı öğrenmek bir şey, gerçek bir ürünü canlıya almak başka bir şey. GİTBİ'de geliştirdiğim her proje, yanımdaki ekip arkadaşlarımla birlikte büyüdü.",
+    time: '9:00 AM',
+    date: 'Mar 2025',
+    hacknitr: 'GİTBİ',
+  },
+  {
+    id: 4,
+    title: 'Samira',
+    img: '/ekip/samira.jpeg',
+    subtitle: '@samira · Content & Media Strategist',
+    content:
+      "İçerik stratejisi üzerine çalışmaya başladığımda çok şey bilmiyordum. GİTBİ'deki ekip bana hem güvendi hem de deneyip öğrenebileceğim bir alan açtı.",
+    time: '11:45 AM',
+    date: 'Nis 2025',
+    hacknitr: 'GİTBİ',
+  },
+  {
+    id: 5,
+    title: 'Ahmet',
+    img: '/ekip/ahmet.jpeg',
+    subtitle: '@ahmet · Kurumsal İlişkiler, İletişim Sorumlusu',
+    content:
+      "Kurumsal görüşmelere girmeden önce çok tedirgindim. Şimdi GİTBİ adına masaya oturuyor, gerçek kurumlarla gerçek ortaklıklar kuruyorum.",
     time: '2:00 PM',
-    date: 'Ara 2024',
+    date: 'May 2025',
     hacknitr: 'GİTBİ',
   },
   {
     id: 6,
-    title: 'Üye — Girişim Projesi',
-    img: 'https://res.cloudinary.com/dscnitrourkela/image/upload/v1756325955/hacknitr/bj1j3roiopyr95dspizq.jpg',
-    subtitle: '@gitbi',
+    title: 'Nazlı',
+    img: '/ekip/nazli.png',
+    subtitle: '@nazli · Team Lead, Social Media & Content Lead',
     content:
-      "GİTBİ'de pasif üyelik yok dediler. İnanmak istedim ama aklımda sorular vardı. Şimdi cevabı biliyorum: Bu gerçek. Ve bu çok doğru bir karar.",
+      "Sosyal medya ekibini yönetmek bana sorumluluk almayı öğretti. GİTBİ'de önemli olan fikrini söylemek değil, o fikri hayata geçirmek.",
     time: '8:30 PM',
-    date: 'Kas 2024',
+    date: 'Haz 2025',
     hacknitr: 'GİTBİ',
   },
 ];

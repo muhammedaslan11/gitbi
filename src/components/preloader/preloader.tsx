@@ -19,13 +19,13 @@ const Preloader = () => {
     if (!isVisible) return null;
 
     return (
-        <TransitionScribble 
+        <TransitionScribble
             key={pathname} // path değişince bileşeni tamamen baştan oluşturup çalıştırır
-            autoRun={true} 
+            autoRun={true}
             onComplete={() => setIsVisible(false)}
             logo={
-                <div className="flex items-center select-none">
-                    <span className="font-sketch-block font-normal text-primary text-6xl md:text-8xl leading-none">
+                <div className="flex items-center text-white select-none">
+                    <span className="font-sketch-block font-normal text-6xl md:text-8xl leading-none">
                         GIT
                     </span>
                     <span className="font-grutch-shaded font-normal text-6xl md:text-8xl leading-none">
