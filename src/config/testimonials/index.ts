@@ -34,7 +34,7 @@ export const testimonialInfo = [
     id: 3,
     title: 'Muhammed Ali',
     img: '/ekip/muhammedali.png',
-    subtitle: '@muhammedali · Founder, Creative Developer',
+    subtitle: '@muhammedali · Founder, CTO',
     content:
       "Kod yazmayı öğrenmek bir şey, gerçek bir ürünü canlıya almak başka bir şey. GİTBİ'de geliştirdiğim her proje, yanımdaki ekip arkadaşlarımla birlikte büyüdü.",
     time: '9:00 AM',

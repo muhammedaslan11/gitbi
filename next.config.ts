@@ -12,6 +12,12 @@ const nextConfig: NextConfig = {
       {
         hostname: 'pub-543c785b9b4940d6a934d856a8a91c99.r2.dev',
       },
+      {
+        hostname: '**.fbcdn.net',
+      },
+      {
+        hostname: '**.cdninstagram.com',
+      },
     ],
   },
 };

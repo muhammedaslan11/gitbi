@@ -316,6 +316,11 @@
     "@eslint/core" "^0.17.0"
     levn "^0.4.1"
 
+"@fancyapps/ui@^6.1.14":
+  version "6.1.14"
+  resolved "https://registry.npmjs.org/@fancyapps/ui/-/ui-6.1.14.tgz"
+  integrity sha512-cBV73XXHrc0qMca+PJJ6qay3xweIgsoYse13rGRstgUs0xA5WAv1tgbSzPCIOOjiLs2S2jiVFJxyszgvgyfxMg==
+
 "@fastify/busboy@^3.0.0":
   version "3.2.0"
   resolved "https://registry.npmjs.org/@fastify/busboy/-/busboy-3.2.0.tgz"

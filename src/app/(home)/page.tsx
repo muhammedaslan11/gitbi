@@ -6,6 +6,8 @@ import AsciiLogger from "@/components/ASCII/ASCIIlog"
 import { FaqList } from "@/components/faq/faq-list"
 import Gallery from "@/components/gallery/gallery"
 import Hero from "@/components/hero/hero"
+import PhotoGallery from "@/components/photo-gallery/photo-gallery"
+import PostGallery from "@/components/post-gallery/post-gallery"
 import Stats from "@/components/stats/stats"
 import Testimonials from "@/components/testimonials/testimonials"
 import { Timeline } from "@/components/timeline/timeline"
@@ -29,6 +31,8 @@ export default function Home() {
       <div className="bg-white overflow-hidden">
         <ScrollMarquee />
         <Timeline />
+        <PostGallery />
+        <PhotoGallery />
       </div>
 
       <div className="bg-on-black">

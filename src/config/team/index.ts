@@ -22,7 +22,7 @@ export const teamItems: TeamItem[] = [
     image: "/ekip/muhammedali.png",
     link: "#",
     title: "Muhammed Ali",
-    description: "Founder | Creative Developer",
+    description: "Founder | CTO",
   },
   {
     image: "/ekip/samira.jpeg",

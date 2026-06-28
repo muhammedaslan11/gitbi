@@ -74,6 +74,25 @@ export default function Footer() {
       <Typography.Lead className="text-sm sm:text-base lg:text-lg xl:text-xl 2xl:text-2xl text-black text-center mt-5">
         {FOOTER_TEXT}
       </Typography.Lead>
+
+      {/* Designed by HARB! */}
+      <Link
+        href="https://www.harbidigital.com/"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="w-full flex items-center justify-center gap-2 mt-6 mb-8 px-4 hover:opacity-75 transition-opacity"
+      >
+        <Typography.Small className="text-black/60 font-prompt">
+          Designed &amp; Developed by
+        </Typography.Small>
+        <Image
+          src="/logo/harbi-logo.png"
+          alt="HARB!"
+          width={80}
+          height={24}
+          className="h-4 sm:h-5 w-auto object-contain"
+        />
+      </Link>
     </footer>
   )
 }
